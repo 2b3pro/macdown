@@ -15,12 +15,25 @@ NSString * const MPDidRequestPreviewRenderNotification =
 NSString * const MPDidRequestEditorSetupNotification =
     @"MPDidRequestEditorSetupNotificationName";
 
+static const CGFloat kPreferencesPanelWidth = 482.0;
+
 @implementation MPPreferencesViewController
 
 - (id)init
 {
     return [self initWithNibName:NSStringFromClass(self.class)
                           bundle:nil];
+}
+
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
+    NSRect frame = self.view.frame;
+    if (frame.size.width < kPreferencesPanelWidth)
+    {
+        frame.size.width = kPreferencesPanelWidth;
+        self.view.frame = frame;
+    }
 }
 
 - (MPPreferences *)preferences
