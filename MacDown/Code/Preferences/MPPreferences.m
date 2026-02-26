@@ -127,6 +127,11 @@ static NSString * const kMPDefaultHtmlStyleName = @"GitHub2";
 @dynamic htmlCodeBlockAccessory;
 @dynamic htmlRendersTOC;
 
+@dynamic htmlPrintPaddingTop;
+@dynamic htmlPrintPaddingBottom;
+@dynamic htmlPrintPaddingLeft;
+@dynamic htmlPrintPaddingRight;
+
 // Private preference.
 @dynamic editorBaseFontInfo;
 
@@ -283,6 +288,14 @@ static NSString * const kMPDefaultHtmlStyleName = @"GitHub2";
         self.editorInsertPrefixInBlock = YES;
     if (![defaults objectForKey:@"htmlTemplateName"])
         self.htmlTemplateName = @"Default";
+    if (![defaults objectForKey:@"htmlPrintPaddingTop"])
+        self.htmlPrintPaddingTop = 0.0;
+    if (![defaults objectForKey:@"htmlPrintPaddingBottom"])
+        self.htmlPrintPaddingBottom = 0.0;
+    if (![defaults objectForKey:@"htmlPrintPaddingLeft"])
+        self.htmlPrintPaddingLeft = 0.0;
+    if (![defaults objectForKey:@"htmlPrintPaddingRight"])
+        self.htmlPrintPaddingRight = 0.0;
 }
 
 @end

@@ -73,6 +73,11 @@ extern NSString * const MPDidDetectFreshInstallationNotification;
 @property (assign) NSURL *htmlDefaultDirectoryUrl;
 @property (assign) BOOL htmlRendersTOC;
 
+@property (assign) CGFloat htmlPrintPaddingTop;
+@property (assign) CGFloat htmlPrintPaddingBottom;
+@property (assign) CGFloat htmlPrintPaddingLeft;
+@property (assign) CGFloat htmlPrintPaddingRight;
+
 // Calculated values.
 @property (readonly) NSString *editorBaseFontName;
 @property (readonly) CGFloat editorBaseFontSize;

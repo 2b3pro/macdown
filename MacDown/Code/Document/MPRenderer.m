@@ -165,6 +165,15 @@ NS_INLINE NSString *MPGetHTML(
 
     MPPreferences *preferences = [MPPreferences sharedInstance];
 
+    // Inject user-configured print content padding
+    NSString *printPadding = [NSString stringWithFormat:
+        @"<style>@media print { body { padding: %.1fpt %.1fpt %.1fpt %.1fpt; } }</style>",
+        preferences.htmlPrintPaddingTop,
+        preferences.htmlPrintPaddingRight,
+        preferences.htmlPrintPaddingBottom,
+        preferences.htmlPrintPaddingLeft];
+    [styleTags addObject:printPadding];
+
     static NSString *f = nil;
     static dispatch_once_t token;
     dispatch_once(&token, ^{
