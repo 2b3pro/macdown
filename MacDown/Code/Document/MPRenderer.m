@@ -601,11 +601,10 @@ NS_INLINE void MPFreeHTMLRenderer(hoedown_renderer *htmlRenderer)
     BOOL hasFrontMatter = [delegate rendererDetectsFrontMatter:self];
     BOOL hasTOC = [delegate rendererRendersTOC:self];
     
-    id frontMatter = nil;
     if (hasFrontMatter)
     {
         NSUInteger offset = 0;
-        frontMatter = [markdown frontMatter:&offset];
+        [markdown frontMatter:&offset];
         markdown = [markdown substringFromIndex:offset];
     }
     hoedown_renderer *htmlRenderer = MPCreateHTMLRenderer(self);
@@ -613,7 +612,7 @@ NS_INLINE void MPFreeHTMLRenderer(hoedown_renderer *htmlRenderer)
     if (hasTOC)
     tocRenderer = MPCreateHTMLTOCRenderer();
     self.currentHtml = MPHTMLFromMarkdown(
-                                          markdown, extensions, smartypants, [frontMatter HTMLTable],
+                                          markdown, extensions, smartypants, nil,
                                           htmlRenderer, tocRenderer);
     if (tocRenderer)
     hoedown_html_renderer_free(tocRenderer);
