@@ -1,111 +1,79 @@
-# Contributing to MacDown
+# Contributing to MacDown (2b3pro fork)
 
-## Coding Style
+Thanks for helping keep MacDown alive on current macOS. This document covers how this fork works day to day. The original author's style guide has been folded in where it still serves the code; his personal preferences have been dropped.
 
-All style rules are enforced under all circumstances except for external dependencies.
+## Scope of this fork
 
-### Objective-C
+Contributions are welcome in these areas:
 
-#### The 80-column Rule
+* Keeping the app building and running natively on current Xcode and macOS (no Rosetta, no deprecated-API crashes).
+* The Quick Look extension (`MacDownQuickLook`).
+* Printing and PDF export (margins, headers and footers, the PDF preferences pane).
+* Bug fixes anywhere in the app.
 
-All code should obey the 80-column rule.
+If a change is not fork-specific and would help everyone, consider also offering it to [MacDownApp/macdown](https://github.com/MacDownApp/macdown). Upstream activity has been low since 2020, so do not block on it.
 
-Exception: If a URL in a comment is too long, it can go over the limit. This happens a lot for Apple’s official documentation. Remember, however, that many websites offer alternative, shorter URL forms that are permanent. For example:
+## Getting set up
 
-* The title slug in StackOverflow (and other StackExchange sites) URLs can be ommitted. The following two are equivalent:
+Follow the **Development** section of the [README](README.md): Xcode 15 or later with the macOS 13 SDK, CocoaPods 1.16 or later, then `pod install` and open `MacDown.xcworkspace`.
 
-    `http://stackoverflow.com/questions/13155612/how-does-one-eliminate-objective-c-try-catch-blocks-like-this`
-    `http://stackoverflow.com/questions/13155612`
+Before opening a pull request, make sure that:
 
-* The commit hash in GitHub commit page’s URL can be shortened. The followings are all equivalent:
+1. The **MacDown** scheme builds in both Debug and Release with no new warnings in code you touched.
+2. The unit tests pass (`Product > Test`, or `xcodebuild -workspace MacDown.xcworkspace -scheme MacDown test`).
+3. If you touched rendering, preferences, or the extension, the Quick Look preview still works: build, run the app once, select a `.md` file in Finder and press Space. `qlmanage` is not a reliable way to test data-based Quick Look extensions; use Finder.
+4. If you changed the Podfile, commit the updated `Podfile.lock` too. The `Pods/` directory is not tracked.
 
-    `https://github.com/uranusjr/macdown/commit/1612abb9dbd24113751958777a49cffc6767989c`
-    `https://github.com/uranusjr/macdown/commit/1612abb9dbd24`
-    `https://github.com/uranusjr/macdown/commit/1612abb`
+## Coding style (Objective-C)
 
-#### Code Blocks
+The codebase follows the upstream conventions below. Match the surrounding code when in doubt.
 
-* Braces go in separate lines. ([Allman style](http://en.wikipedia.org/wiki/Indent_style#Allman_style).)
-* If only one statement is contained inside the block, omit braces unless...
-    * This is part of an if-(else if-)else structure. All brace styles in the same structure should match (i.e. either non or all of them omit braces).
+* **80 columns.** Long URLs in comments may exceed the limit; prefer the shortest permanent form of the URL.
+* **Allman braces**: opening braces on their own line. Omit braces around a single-statement body, except inside an `if` / `else if` / `else` chain where all branches must match.
+* **Implicit boolean checks** where the meaning is emptiness or nil-ness (`if (str.length)`, `if (obj)`). Use an explicit `== 0` / `!= 0` when comparing a real number such as an `NSRange` location or a coordinate.
+* **Multi-line conditions** put the logical operator at the start of the continuation line, and add extra indentation when alignment would otherwise be ambiguous:
 
-#### Stetements Inside `if`, `while`, etc.
-
-* Prefer implicit boolean conversion when it makes sense.
-    * `if (str.length)` is better than `if (str.length != 0)` if you want to know whether a string is empty. 
-    * The same applies when checking for an object’s `nil`-ness.
-    * If what you want to compare against is *zero as a number*, not emptiness, such as for `NSRange` position, `NSPoint` coordinates, etc., *do* use the `== 0`/`!= 0` expression.
-
-* If statements need to span multiple lines, prefer putting logical operators at the *beginning* of the line.
-
-    Yes:
-    ```c
-    while (this_is_very_long
-           || this_is_also_very_long)
-    {
-        // ...
-    }
-    ```
-
-    No:
-    ```c
-    while (this_is_very_long ||
-           this_is_also_very_long)
-    {
-        // ...
-    }
-    ```
-
-* If code alignment is ambiguious, add extra indentation.
-
-    Yes:
     ```c
     if (this_is_very_long
             || this_is_also_very_long)
         foo++;
     ```
 
-    No:
-    ```c
-    if (this_is_very_long
-        || this_is_also_very_long)
-        foo++;
-    ```
+* **Four spaces**, no tabs. No trailing whitespace. Files end with a newline. Xcode's "Automatically trim trailing whitespace" setting handles most of this.
+* **Class prefix** is `MP`. New source files go in the matching group under `MacDown/Code/` (Application, Document, Extension, Preferences, Utility, View) or under `MacDownQuickLook/` for the extension.
 
-    The above is not enforced (but recommended) if braces exist. Useful if you have a hard time fitting the statement into the 80-column constraint.
+## Quick Look extension notes
 
-    Okay:
-    ```c
-    if (this_is_very_long
-        || this_is_very_very_truly_long)
-    {
-        foo++;
-        bar--;
-    }
-    ```
+* The extension is sandboxed and cannot link the app's CocoaPods. It compiles Hoedown and `hoedown_html_patch.c` directly and mirrors the relevant parts of `MPRenderer`. If you change the app's rendering pipeline or add a rendering preference, make the matching change in `MPQuickLookPreviewProvider.m` so previews stay consistent.
+* Preferences are read from the `com.uranusjr.macdown` defaults domain through a `shared-preference.read-only` entitlement. New keys need no entitlement change; new file locations do.
+* Quick Look does not run JavaScript, so anything that depends on Prism, MathJax, or Mermaid is out of scope for the preview.
 
-#### Invisible Characters
+## Version control
 
-Always use *four spaces* instead of tabs for indentation. Trailing whitespaces should be removed. You can turn on the **Automatically trim trailing whitespace** option in Xcode to let it do the job for you.
+### Branches and commits
 
-Try to ensure that there’s a trailing newline in the end of a file. This is not strictly enforced since there are no easy ways to do that (except checking manually), but I’d appriciate the effort.
+* Work on a branch off `master` and rebase before opening the pull request. Merges of `.xib` and `project.pbxproj` files are painful; keep those changes in their own small commits so they can be reapplied if the rebase breaks.
+* Commit subject lines: imperative mood, 72 characters or fewer, no trailing period. Use the body to explain **why**, not just what. Wrap the body at 72 columns.
+* One logical change per commit. Formatting-only changes go in a separate commit from behavior changes.
 
-## Version Control
+### Pull requests
 
-MacDown uses Git for source control, and is hosted on GitHub.
+* Describe what changed, why, and how you verified it (the checklist above). Screenshots are welcome for UI and Quick Look changes.
+* Small, focused PRs get reviewed and merged faster than large ones.
+* The maintainer may squash or rebase your commits when merging. Authorship is preserved.
 
-### Commit Messages
+### Project file
 
-[General rules](http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html) apply. If you absolutely need to, the first line of the message *can* go as long as 72 (instead of 50) characters, but it must not exceed it.
+Edit `MacDown.xcodeproj/project.pbxproj` through Xcode where possible. If you must edit it by hand, keep the diff minimal and confirm the project still opens and builds. Do not commit `xcuserdata`.
 
-Xcode’s commit window does not do a good job indicating whether your commit message is well-formed. I seldom use it personally, but if you do, you can check whether the commit message is good after you push to GitHub—If you see the first line of your commit message getting truncated, it is too long.
+## Versioning and releases
 
-### Pull Requests
+The version comes from `Tools/version.txt` plus git tags; see **Versioning** in the README. Do not edit `CFBundleShortVersionString` or `CFBundleVersion` in the Info.plist files by hand; the "Update Build Number" build phase stamps both the app and the extension.
 
-Please rebase your branch to `master` when you submit the pull request. There can be some nagging bugs when Git tries to merge files that are not code, particularly `.xib` and project files. When in doubt, always consider splitting changes into smaller commits so that you won’t need to re-apply your changes when things break.
+## Localization
 
-Under certain circumstances I may wish you to perform further rebasing and/or squashing *after* you submit your pull request, or even perform them myself instead of merging your commits as-is. Don’t worry—you will always get full credits for your contribution.
+Existing localizations come from upstream's Transifex project. New user-facing strings added in this fork should be added to the Base localization in English. Do not hand-edit the other `.lproj` folders unless you are a fluent speaker of that language.
 
-## More to Come
+## License
 
-This style guide is a work in progress. Please feel free to ask if you have any questions about it. I’ll add more rules if there’s ambiguity.
+MacDown is MIT licensed (see [LICENSE.txt](LICENSE.txt)). By contributing, you agree that your contributions are licensed under the same terms.

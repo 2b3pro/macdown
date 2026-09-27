@@ -1,19 +1,50 @@
-# MacDown
+# MacDown (2b3pro fork)
 
-[![](https://img.shields.io/github/release/MacDownApp/macdown.svg)](http://macdown.uranusjr.com/download/latest/)
-![Total downloads](https://img.shields.io/github/downloads/MacDownApp/macdown/latest/total.svg)
-[![Build Status](https://travis-ci.org/MacDownApp/macdown.svg?branch=master)](https://travis-ci.org/MacDownApp/macdown)
+![MacDown, revived: the 2B3 fork of the classic Mac Markdown editor](assets/hero.png)
 
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE.txt)
+![Platform](https://img.shields.io/badge/macOS-13%2B%20%7C%20Apple%20Silicon%20%2B%20Intel-lightgrey.svg)
 
-MacDown is an open source Markdown editor for OS X, released under the MIT License. The author stole the idea from [Chen Luo](https://twitter.com/chenluois)’s [Mou](http://mouapp.com) so that people can make crappy clones.
+MacDown is an open source Markdown editor for macOS, created by [Tzu-ping Chung](https://github.com/uranusjr) and released under the MIT License. This repository is a maintained fork of [MacDownApp/macdown](https://github.com/MacDownApp/macdown) that brings the app to current macOS and Xcode, runs natively on Apple Silicon, and adds a handful of features around printing, PDF export, and Finder integration.
 
-Visit the [project site](http://macdown.uranusjr.com/) for more information, or download [MacDown.app.zip](http://macdown.uranusjr.com/download/latest/) directly from the [latest releases](https://github.com/MacDownApp/macdown/releases/latest) page.
+Upstream has been quiet since 2020, and its last release (0.7.3) ships an Intel-only Sparkle framework that needs Rosetta. This fork removes that dependency.
+
+## What is different in this fork
+
+**Platform and build**
+
+* Builds with current Xcode (27) against the macOS 13 SDK; deployment target is macOS 13 (Ventura) or later.
+* Universal binaries (arm64 + x86_64) for the app, the command line tool, the Quick Look extension, and Sparkle. Nothing in the bundle requires Rosetta.
+* Sparkle updated from 1.18 to 1.27 (last 1.x line, same API, universal). CocoaPods dependencies are lifted to the app's deployment target so the project builds again on modern Xcode.
+
+**Quick Look extension**
+
+* Select a `.md` or `.markdown` file in Finder and press Space to see it rendered with your MacDown preview style.
+* The extension honors your MacDown rendering preferences: Markdown extensions, SmartyPants, table of contents, task lists, hard wrap, and YAML front matter detection. It falls back to the GitHub2 style if your selected style file cannot be found.
+* Quick Look does not run JavaScript, so Prism syntax highlighting, MathJax, and Mermaid are not rendered in previews.
+
+**Printing and PDF export**
+
+* Optional headers and footers on exported and printed PDFs. Each of the six zones (header/footer, left/center/right) can show the document name, a timestamp, page number, page count, "Page X of Y", or custom text. A different first page and the font size are configurable in a new **PDF** preferences pane.
+* Margins now follow **File > Page Setup** instead of hardcoded values, and the bundled stylesheets no longer add their own print margins, so whitespace is predictable.
+* User-configurable print content padding in the **Rendering** preferences.
+
+**Rendering**
+
+* YAML front matter is stripped from the preview and from printed output instead of being rendered as a table.
+* New **GitHub-2020** preview style.
+
+**Preferences window**
+
+* Panels use Auto Layout and keep a consistent width when switching between them.
 
 ## Install
 
-[Download](http://macdown.uranusjr.com/download/latest/), unzip, and drag the app to Applications folder. MacDown is also available through [Homebrew Cask](https://caskroom.github.io/):
+There is no Homebrew cask for this fork (the `macdown` cask installs upstream 0.7.3). Build from source as described below, or download a prebuilt app from this repository's [Releases](https://github.com/2b3pro/macdown/releases) page when one is available, unzip it, and drag it to your Applications folder.
 
-    brew install --cask macdown
+The Quick Look extension is registered by macOS once the app is in your Applications folder. If Finder previews do not change right away, launch MacDown once.
+
+In-app update checks still point at the upstream Sparkle feed, which only carries older releases, so they will not offer anything for this fork.
 
 ## Screenshot
 
@@ -21,7 +52,7 @@ Visit the [project site](http://macdown.uranusjr.com/) for more information, or 
 
 ## License
 
-MacDown is released under the terms of MIT License. You may find the content of the license [here](http://opensource.org/licenses/MIT), or inside the `LICENSE` directory.
+MacDown is released under the terms of the MIT License; see [LICENSE.txt](LICENSE.txt). This fork keeps the same license. The original upstream license text is also in `LICENSE/macdown.txt`.
 
 You may find full text of licenses about third-party components in the `LICENSE` directory, or the **About MacDown** panel in the application.
 
@@ -47,13 +78,9 @@ The following editor themes and CSS files are extracted from [Mou](http://mouapp
 
 ### Requirements
 
-If you wish to build MacDown yourself, you will need the following components/tools:
-
-* OS X SDK (10.14 or later)
+* Xcode 15 or later with the macOS 13 SDK (the app and its Quick Look extension target macOS 13.0)
 * Git
-* [Bundler](http://bundler.io)
-
-> Note: Old versions of CocoaPods are not supported. Please use Bundler to execute CocoaPods, or make sure your CocoaPods is later than shown in `Gemfile.lock`.
+* [CocoaPods](https://cocoapods.org) 1.16 or later, either via [Bundler](http://bundler.io) or installed directly (`brew install cocoapods`)
 
 > Note: The Command Line Tools (CLT) should be unnecessary. If you failed to compile without it, please install CLT with
 >
@@ -61,41 +88,58 @@ If you wish to build MacDown yourself, you will need the following components/to
 >
 > and report back.
 
-An appropriate SDK should be bundled with Xcode 5 or later versions.
-
 ### Environment Setup
 
 After cloning the repository, run the following commands inside the repository root (directory containing this `README.md` file):
 
     git submodule update --init
-    bundle install
-    bundle exec pod install
+    pod install
     make -C Dependency/peg-markdown-highlight
 
-and open `MacDown.xcworkspace` in Xcode. The first command initialises the dependency submodule(s) used in MacDown; the second one installs dependencies managed by CocoaPods.
+and open `MacDown.xcworkspace` in Xcode. The first command initialises the dependency submodule(s) used in MacDown; the second one installs dependencies managed by CocoaPods. If you use Bundler, run `bundle install` and then `bundle exec pod install` instead.
 
-Refer to the official guides of Git and CocoaPods if you need more instructions. If you run into build issues later on, try running the following commands to update dependencies:
+If you run into build issues later on, try running the following commands to update dependencies:
 
     git submodule update
-    bundle exec pod install
+    pod install
+
+### Targets
+
+* **MacDown**: the application.
+* **MacDownQuickLook**: the Quick Look preview extension, embedded in the app bundle. It compiles Hoedown and MacDown's renderer patches directly, so it stays in sync with the app's rendering.
+* **macdown-cmd**: the `macdown` command line utility, copied into the app bundle.
+* **MacDownTests**: unit tests.
+
+### Versioning
+
+The short version comes from the newest `v*` tag when building exactly at that tag. Otherwise it is the value in `Tools/version.txt` with a `d<commits since tag>` suffix (for example `0.10.0d12`). Both the app and the Quick Look extension are stamped with the same version at build time. Bump `Tools/version.txt` when starting work on a new release, and tag the release commit `vX.Y.Z`.
 
 ### Translation
 
-Please help translation on [Transifex](https://www.transifex.com/macdown/macdown/).
-
-![Transifex translation percentage](https://www.transifex.com/projects/p/macdown/resource/macdownxliff/chart/image_png/)
+Localizations are inherited from upstream, which manages them on [Transifex](https://www.transifex.com/macdown/macdown/). New strings added in this fork are English only for now.
 
 ## Discussion
 
-[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/MacDownApp/macdown)
+Please [file an issue](https://github.com/2b3pro/macdown/issues/new) on this repository for problems with the fork-specific features listed above. **Search first to make sure no-one has reported the same issue already.**
 
-Join our [Gitter channel](https://gitter.im/MacDownApp/macdown) if you have any problems with MacDown. Any suggestions are welcomed, too!
+MacDown depends a lot on other open source projects, such as [Hoedown](https://github.com/hoedown/hoedown) for Markdown-to-HTML rendering, [Prism](http://prismjs.com) for syntax highlighting (in code blocks), and [PEG Markdown Highlight](https://github.com/ali-rantakari/peg-markdown-highlight) for editor highlighting. If you find problems when using those particular features, consider reporting them to the upstream projects as well.
 
-You can also [file an issue directly](https://github.com/MacDownApp/macdown/issues/new) on GitHub if you prefer so. But please, **search first to make sure no-one has reported the same issue already** before opening one yourself. MacDown does not update in your computer immediately when we make changes, so something you experienced might be known, or even fixed in the development version.
+## Upstream and credits
 
-MacDown depends a lot on other open source projects, such as [Hoedown](https://github.com/hoedown/hoedown) for Markdown-to-HTML rendering, [Prism](http://prismjs.com) for syntax highlighting (in code blocks), and [PEG Markdown Highlight](https://github.com/ali-rantakari/peg-markdown-highlight) for editor highlighting. If you find problems when using those particular features, you can also consider reporting them directly to upstream projects as well as to MacDown’s issue tracker. I will do what I can if you report it here, but sometimes it can be more beneficial to interact with them directly.
+MacDown was created and maintained by Tzu-ping Chung. Visit the original [project site](http://macdown.uranusjr.com/) and [repository](https://github.com/MacDownApp/macdown), and if MacDown is useful to you, consider [tipping the original author](http://macdown.uranusjr.com/faq/#donation). The author's own words: the idea was borrowed from [Chen Luo](https://twitter.com/chenluois)'s [Mou](http://mouapp.com) "so that people can make crappy clones."
 
-## Tipping
+Fork maintained by [Ian Shen](https://github.com/2b3pro).
 
-If you find MacDown suitable for your needs, please consider [giving me a tip through PayPal](http://macdown.uranusjr.com/faq/#donation). Or, if you prefer to buy me a drink *personally* instead, just [send me a tweet](https://twitter.com/uranusjr) when you visit [Taipei, Taiwan](http://en.wikipedia.org/wiki/Taipei), where I live. I look forward to meeting you!
+---
 
+## Support
+
+Macdown is free and always will be. But I won't stop you from buying me a coffee and croissant!
+
+<a href="https://paypal.me/2b3/5">
+  <img src="https://img.shields.io/badge/Donate-PayPal-blue.svg" alt="Donate with PayPal" />
+</a>
+
+**[Buy me a cup of coffee and croissant!](https://paypal.me/2b3/10)**
+
+---

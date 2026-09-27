@@ -123,7 +123,7 @@
 	<key>NSAppleScriptEnabled</key>
 	<true/>
 	<key>NSHumanReadableCopyright</key>
-	<string>Copyright © 2014–2020 Tzu-ping Chung.</string>
+	<string>Copyright © 2014–2020 Tzu-ping Chung. Fork changes © 2026 2B3 PRODUCTIONS LLC / Ian Shen.</string>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
