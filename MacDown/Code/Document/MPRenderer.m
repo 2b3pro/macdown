@@ -165,7 +165,10 @@ NS_INLINE NSString *MPGetHTML(
 
     MPPreferences *preferences = [MPPreferences sharedInstance];
 
-    // Inject user-configured print content padding
+    // Inject user-configured print content padding.
+    // Note: WebKit's WebFrameView printing ignores CSS @media print rules
+    // for layout; the actual print inset is applied via PDF post-processing
+    // in MPPDFHeaderFooterProcessor. This CSS is kept for HTML export.
     NSString *printPadding = [NSString stringWithFormat:
         @"<style>@media print { body { padding: %.1fpt %.1fpt %.1fpt %.1fpt; } }</style>",
         preferences.htmlPrintPaddingTop,

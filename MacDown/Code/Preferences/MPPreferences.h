@@ -78,6 +78,23 @@ extern NSString * const MPDidDetectFreshInstallationNotification;
 @property (assign) CGFloat htmlPrintPaddingLeft;
 @property (assign) CGFloat htmlPrintPaddingRight;
 
+// PDF Header/Footer settings.
+@property (assign) BOOL pdfHeaderFooterEnabled;
+@property (assign) BOOL pdfDifferentFirstPage;
+@property (assign) CGFloat pdfHeaderFooterFontSize;
+@property (assign) NSInteger pdfHeaderLeftType;
+@property (assign) NSString *pdfHeaderLeftCustomText;
+@property (assign) NSInteger pdfHeaderCenterType;
+@property (assign) NSString *pdfHeaderCenterCustomText;
+@property (assign) NSInteger pdfHeaderRightType;
+@property (assign) NSString *pdfHeaderRightCustomText;
+@property (assign) NSInteger pdfFooterLeftType;
+@property (assign) NSString *pdfFooterLeftCustomText;
+@property (assign) NSInteger pdfFooterCenterType;
+@property (assign) NSString *pdfFooterCenterCustomText;
+@property (assign) NSInteger pdfFooterRightType;
+@property (assign) NSString *pdfFooterRightCustomText;
+
 // Calculated values.
 @property (readonly) NSString *editorBaseFontName;
 @property (readonly) CGFloat editorBaseFontSize;

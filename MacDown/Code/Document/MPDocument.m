@@ -28,9 +28,11 @@
 #import "MPEditorPreferencesViewController.h"
 #import "MPExportPanelAccessoryViewController.h"
 #import "MPMathJaxListener.h"
+#import "MPPDFHeaderFooterProcessor.h"
 #import "WebView+WebViewPrivateHeaders.h"
 #import "MPToolbarController.h"
 #import <JavaScriptCore/JavaScriptCore.h>
+#import <Quartz/Quartz.h>
 
 static NSString * const kMPDefaultAutosaveName = @"Untitled";
 
@@ -211,6 +213,8 @@ typedef NS_ENUM(NSUInteger, MPWordCountType) {
 @property (strong) NSMenuItem *charNoSpacesMenuItem;
 @property (nonatomic) BOOL needsToUnregister;
 @property (nonatomic) BOOL alreadyRenderingInWeb;
+@property (strong) NSURL *pendingPDFExportURL;
+@property (strong) NSURL *pendingPrintTempURL;
 @property (nonatomic) BOOL renderToWebPending;
 @property (strong) NSArray<NSNumber *> *webViewHeaderLocations;
 @property (strong) NSArray<NSNumber *> *editorHeaderLocations;
@@ -612,6 +616,17 @@ static void (^MPGetPreviewLoadingCompletionHandler(MPDocument *doc))()
     info.horizontalPagination = NSAutoPagination;
     info.verticalPagination = NSAutoPagination;
     info.verticallyCentered = NO;
+
+    // Use standard letter-size paper with zero margins.
+    // WebKit's WebFrameView ignores custom paper sizes and margins,
+    // so the post-processor handles margin insets by scaling and
+    // repositioning each page on the output.
+    info.paperSize = NSMakeSize(612.0, 792.0);
+    info.topMargin = 0;
+    info.bottomMargin = 0;
+    info.leftMargin = 0;
+    info.rightMargin = 0;
+
     return info;
 }
 
@@ -641,10 +656,124 @@ static void (^MPGetPreviewLoadingCompletionHandler(MPDocument *doc))()
         if (contextInfo)
             [invocation setArgument:&contextInfo atIndex:2];
     }
-    [super printDocumentWithSettings:printSettings
-                      showPrintPanel:showPrintPanel delegate:self
-                    didPrintSelector:@selector(document:didPrint:context:)
-                         contextInfo:(void *)invocation];
+
+    // For PDF export (showPrintPanel:NO), use the default WebFrameView path
+    // and let the didPrint callback handle post-processing.
+    if (!showPrintPanel)
+    {
+        [super printDocumentWithSettings:printSettings
+                          showPrintPanel:NO delegate:self
+                        didPrintSelector:@selector(document:didPrint:context:)
+                             contextInfo:(void *)invocation];
+        return;
+    }
+
+    // For interactive Print (Cmd-P), render to a temp PDF first, then
+    // post-process it (margins + headers/footers), and print the result.
+    // This is necessary because WebFrameView ignores NSPrintInfo margins
+    // and CSS @media print padding/margin rules.
+    [self printViaTemporaryPDFWithSettings:printSettings
+                                 delegate:self
+                         didPrintSelector:@selector(document:didPrint:context:)
+                              contextInfo:(void *)invocation];
+}
+
+- (void)printViaTemporaryPDFWithSettings:(NSDictionary *)printSettings
+                                delegate:(id)delegate
+                        didPrintSelector:(SEL)selector
+                             contextInfo:(void *)contextInfo
+{
+    // 1. Render to a temporary PDF via WebFrameView.
+    NSString *tempPath = [NSTemporaryDirectory()
+        stringByAppendingPathComponent:[[NSUUID UUID] UUIDString]];
+    tempPath = [tempPath stringByAppendingPathExtension:@"pdf"];
+    NSURL *tempURL = [NSURL fileURLWithPath:tempPath];
+
+    NSPrintInfo *info = [self.printInfo copy];
+    [info.dictionary addEntriesFromDictionary:@{
+        NSPrintJobDisposition: NSPrintSaveJob,
+        NSPrintJobSavingURL: tempURL,
+    }];
+
+    WebFrameView *view = self.preview.mainFrame.frameView;
+    NSPrintOperation *renderOp = [view printOperationWithPrintInfo:info];
+    renderOp.showsPrintPanel = NO;
+    renderOp.showsProgressPanel = NO;
+
+    [renderOp runOperationModalForWindow:self.windowForSheet
+                                delegate:self
+                          didRunSelector:@selector(renderOperation:didSucceed:tempURL:)
+                             contextInfo:(__bridge_retained void *)@[
+                                 tempURL,
+                                 printSettings ?: @{},
+                                 delegate ?: [NSNull null],
+                                 [NSValue valueWithPointer:selector],
+                                 [NSValue valueWithPointer:contextInfo],
+                             ]];
+}
+
+- (void)renderOperation:(NSPrintOperation *)op
+             didSucceed:(BOOL)success
+                tempURL:(void *)contextInfo
+{
+    NSArray *ctx = (__bridge_transfer NSArray *)contextInfo;
+    NSURL *tempURL = ctx[0];
+    NSDictionary *printSettings = ctx[1];
+    id originalDelegate = ctx[2];
+    if ([originalDelegate isEqual:[NSNull null]])
+        originalDelegate = nil;
+    SEL originalSelector = [ctx[3] pointerValue];
+    void *originalContext = [ctx[4] pointerValue];
+
+    if (!success)
+    {
+        self.printing = NO;
+        [[NSFileManager defaultManager] removeItemAtURL:tempURL error:nil];
+        return;
+    }
+
+    // 2. Post-process: apply margins and headers/footers.
+    MPPDFHeaderFooterProcessor *processor =
+        [[MPPDFHeaderFooterProcessor alloc] init];
+    [processor processFileAtURL:tempURL
+                  documentTitle:self.presumedFileName
+                    preferences:self.preferences
+                          error:nil];
+
+    // 3. Open the post-processed PDF and create a print operation from it.
+    PDFDocument *pdfDoc = [[PDFDocument alloc] initWithURL:tempURL];
+    if (!pdfDoc)
+    {
+        self.printing = NO;
+        [[NSFileManager defaultManager] removeItemAtURL:tempURL error:nil];
+        return;
+    }
+
+    NSPrintInfo *printInfo = [self.printInfo copy];
+    [printInfo.dictionary addEntriesFromDictionary:printSettings];
+    NSPrintOperation *printOp = [pdfDoc printOperationForPrintInfo:printInfo
+                                                          scalingMode:kPDFPrintPageScaleNone
+                                                             autoRotate:YES];
+    printOp.showsPrintPanel = YES;
+
+    // Store temp URL for cleanup after printing.
+    self.pendingPrintTempURL = tempURL;
+
+    NSWindow *window = self.windowForSheet;
+    if (window)
+    {
+        [printOp runOperationModalForWindow:window
+                                    delegate:self
+                              didRunSelector:@selector(document:didPrint:context:)
+                                 contextInfo:originalContext];
+    }
+    else
+    {
+        [printOp runOperation];
+        self.printing = NO;
+        [[NSFileManager defaultManager] removeItemAtURL:tempURL error:nil];
+        self.pendingPrintTempURL = nil;
+    }
 }
 
 - (BOOL)validateUserInterfaceItem:(id<NSValidatedUserInterfaceItem>)item
@@ -1283,13 +1412,50 @@ static void (^MPGetPreviewLoadingCompletionHandler(MPDocument *doc))()
         if (result != NSFileHandlingPanelOKButton)
             return;
 
+        NSURL *outputURL = panel.URL;
+        self.pendingPDFExportURL = outputURL;
         NSDictionary *settings = @{
             NSPrintJobDisposition: NSPrintSaveJob,
-            NSPrintJobSavingURL: panel.URL,
+            NSPrintJobSavingURL: outputURL,
         };
-        [self printDocumentWithSettings:settings showPrintPanel:NO delegate:nil
-                       didPrintSelector:NULL contextInfo:NULL];
+        [self printDocumentWithSettings:settings showPrintPanel:NO
+                               delegate:nil didPrintSelector:NULL
+                            contextInfo:NULL];
     }];
+}
+
+- (void)pdfExportDidFinishWithSuccess:(BOOL)ok
+{
+    NSURL *outputURL = self.pendingPDFExportURL;
+    self.pendingPDFExportURL = nil;
+
+    if (!ok || !outputURL)
+        return;
+
+    // Check whether any post-processing is needed (margins or headers/footers).
+    MPPreferences *prefs = self.preferences;
+    BOOL needsMargins = (prefs.htmlPrintPaddingTop > 0 ||
+                         prefs.htmlPrintPaddingBottom > 0 ||
+                         prefs.htmlPrintPaddingLeft > 0 ||
+                         prefs.htmlPrintPaddingRight > 0);
+    BOOL needsHeaderFooter = prefs.pdfHeaderFooterEnabled;
+    if (!needsMargins && !needsHeaderFooter)
+        return;
+
+    MPPDFHeaderFooterProcessor *processor =
+        [[MPPDFHeaderFooterProcessor alloc] init];
+    NSError *error = nil;
+    if (![processor processFileAtURL:outputURL
+                       documentTitle:self.presumedFileName
+                         preferences:self.preferences
+                               error:&error])
+    {
+        if (error)
+        {
+            NSAlert *alert = [NSAlert alertWithError:error];
+            [alert runModal];
+        }
+    }
 }
 
 - (IBAction)convertToH1:(id)sender
@@ -1998,6 +2164,19 @@ current file somewhere to enable this feature.", \
 {
     if ([doc respondsToSelector:@selector(setPrinting:)])
         ((MPDocument *)doc).printing = NO;
+
+    // Check for pending PDF export post-processing.
+    if (self.pendingPDFExportURL)
+        [self pdfExportDidFinishWithSuccess:ok];
+
+    // Clean up temp PDF from the print-via-temp-PDF path.
+    if (self.pendingPrintTempURL)
+    {
+        [[NSFileManager defaultManager] removeItemAtURL:self.pendingPrintTempURL
+                                                  error:nil];
+        self.pendingPrintTempURL = nil;
+    }
+
     if (context)
     {
         NSInvocation *invocation = (__bridge NSInvocation *)context;

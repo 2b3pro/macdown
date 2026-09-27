@@ -132,6 +132,22 @@ static NSString * const kMPDefaultHtmlStyleName = @"GitHub2";
 @dynamic htmlPrintPaddingLeft;
 @dynamic htmlPrintPaddingRight;
 
+@dynamic pdfHeaderFooterEnabled;
+@dynamic pdfDifferentFirstPage;
+@dynamic pdfHeaderFooterFontSize;
+@dynamic pdfHeaderLeftType;
+@dynamic pdfHeaderLeftCustomText;
+@dynamic pdfHeaderCenterType;
+@dynamic pdfHeaderCenterCustomText;
+@dynamic pdfHeaderRightType;
+@dynamic pdfHeaderRightCustomText;
+@dynamic pdfFooterLeftType;
+@dynamic pdfFooterLeftCustomText;
+@dynamic pdfFooterCenterType;
+@dynamic pdfFooterCenterCustomText;
+@dynamic pdfFooterRightType;
+@dynamic pdfFooterRightCustomText;
+
 // Private preference.
 @dynamic editorBaseFontInfo;
 
@@ -286,6 +302,8 @@ static NSString * const kMPDefaultHtmlStyleName = @"GitHub2";
         self.editorAutoIncrementNumberedLists = YES;
     if (![defaults objectForKey:@"editorInsertPrefixInBlock"])
         self.editorInsertPrefixInBlock = YES;
+    if (![defaults objectForKey:@"htmlDetectFrontMatter"])
+        self.htmlDetectFrontMatter = YES;
     if (![defaults objectForKey:@"htmlTemplateName"])
         self.htmlTemplateName = @"Default";
     if (![defaults objectForKey:@"htmlPrintPaddingTop"])
@@ -296,6 +314,8 @@ static NSString * const kMPDefaultHtmlStyleName = @"GitHub2";
         self.htmlPrintPaddingLeft = 0.0;
     if (![defaults objectForKey:@"htmlPrintPaddingRight"])
         self.htmlPrintPaddingRight = 0.0;
+    if (![defaults objectForKey:@"pdfHeaderFooterFontSize"])
+        self.pdfHeaderFooterFontSize = 9.0;
 }
 
 @end

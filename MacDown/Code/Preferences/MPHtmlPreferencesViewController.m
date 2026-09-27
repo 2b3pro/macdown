@@ -48,6 +48,12 @@ NS_INLINE NSString *MPPrismDefaultThemeName()
 
 - (void)viewWillAppear
 {
+    // Clear any stale cached frame from MASPreferences so the window
+    // sizes to the view's actual bounds instead of an old stored size.
+    NSString *key = [NSString stringWithFormat:@"MASPreferences %@ Frame",
+                     self.viewIdentifier];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:key];
+
     [self loadStylesheets];
     [self loadHighlightingThemes];
 }

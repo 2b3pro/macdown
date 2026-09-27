@@ -14,17 +14,17 @@
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <customView id="Hz6-mo-xeY">
-            <rect key="frame" x="0.0" y="0.0" width="400" height="230"/>
+            <rect key="frame" x="0.0" y="0.0" width="800" height="230"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
-                <box borderType="line" title="Block formatting" translatesAutoresizingMaskIntoConstraints="NO" id="TXy-fD-S4Y">
-                    <rect key="frame" x="20" y="80" width="173" height="72"/>
+                <box misplaced="YES" borderType="line" title="Block formatting" translatesAutoresizingMaskIntoConstraints="NO" id="TXy-fD-S4Y">
+                    <rect key="frame" x="20" y="80" width="375" height="72"/>
                     <view key="contentView" id="YjE-mG-z1L">
-                        <rect key="frame" x="0.0" y="0.0" width="173" height="60"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="60"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <button translatesAutoresizingMaskIntoConstraints="NO" id="J8u-0k-Z3s">
-                                <rect key="frame" x="16" y="33" width="141" height="16"/>
+                                <rect key="frame" x="16" y="33" width="541" height="16"/>
                                 <buttonCell key="cell" type="check" title="Table" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="z8g-3M-hbc">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -34,7 +34,7 @@
                                 </connections>
                             </button>
                             <button translatesAutoresizingMaskIntoConstraints="NO" id="fhk-gr-iF0">
-                                <rect key="frame" x="16" y="11" width="141" height="16"/>
+                                <rect key="frame" x="16" y="11" width="541" height="16"/>
                                 <buttonCell key="cell" type="check" title="Fenced code block" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="ELg-sx-vIf">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -57,8 +57,32 @@
                         </constraints>
                     </view>
                 </box>
-                <box borderType="line" title="Inline formatting" translatesAutoresizingMaskIntoConstraints="NO" id="Ycc-Px-jbu">
-                    <rect key="frame" x="201" y="6" width="179" height="204"/>
+                <box horizontalHuggingPriority="1" misplaced="YES" borderType="line" title="Document formatting" translatesAutoresizingMaskIntoConstraints="NO" id="x36-52-U0p">
+                    <rect key="frame" x="20" y="160" width="375" height="50"/>
+                    <view key="contentView" id="scn-J3-H0V">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="38"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <button translatesAutoresizingMaskIntoConstraints="NO" id="rDS-Bm-rxW">
+                                <rect key="frame" x="16" y="11" width="99" height="16"/>
+                                <buttonCell key="cell" type="check" title="Smartypants" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="aSK-nR-xMr">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <binding destination="-2" name="value" keyPath="self.preferences.extensionSmartyPants" id="otX-6E-4Jp"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <constraints>
+                            <constraint firstItem="rDS-Bm-rxW" firstAttribute="leading" secondItem="scn-J3-H0V" secondAttribute="leading" constant="16" id="CDi-Lt-pfU"/>
+                            <constraint firstItem="rDS-Bm-rxW" firstAttribute="top" secondItem="scn-J3-H0V" secondAttribute="top" constant="11" id="LIS-AY-YUh"/>
+                            <constraint firstAttribute="bottom" secondItem="rDS-Bm-rxW" secondAttribute="bottom" constant="11" id="eV0-qt-mpH"/>
+                        </constraints>
+                    </view>
+                </box>
+                <box misplaced="YES" borderType="line" title="Inline formatting" translatesAutoresizingMaskIntoConstraints="NO" id="Ycc-Px-jbu">
+                    <rect key="frame" x="425" y="6" width="179" height="204"/>
                     <view key="contentView" id="wTw-go-erC">
                         <rect key="frame" x="0.0" y="0.0" width="179" height="192"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -170,30 +194,6 @@
                             <constraint firstItem="T31-Sx-beD" firstAttribute="top" secondItem="lYF-J6-3YU" secondAttribute="bottom" constant="6" id="sa2-1e-2Xh"/>
                             <constraint firstItem="tqY-25-uOh" firstAttribute="leading" secondItem="QMR-TV-GNi" secondAttribute="leading" id="sgT-GA-YPl"/>
                             <constraint firstItem="tqY-25-uOh" firstAttribute="leading" secondItem="iwB-ah-rER" secondAttribute="leading" id="vpS-tR-3bY"/>
-                        </constraints>
-                    </view>
-                </box>
-                <box horizontalHuggingPriority="1" borderType="line" title="Document formatting" translatesAutoresizingMaskIntoConstraints="NO" id="x36-52-U0p">
-                    <rect key="frame" x="20" y="160" width="173" height="50"/>
-                    <view key="contentView" id="scn-J3-H0V">
-                        <rect key="frame" x="0.0" y="0.0" width="173" height="38"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <subviews>
-                            <button translatesAutoresizingMaskIntoConstraints="NO" id="rDS-Bm-rxW">
-                                <rect key="frame" x="16" y="11" width="99" height="16"/>
-                                <buttonCell key="cell" type="check" title="Smartypants" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="aSK-nR-xMr">
-                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <connections>
-                                    <binding destination="-2" name="value" keyPath="self.preferences.extensionSmartyPants" id="otX-6E-4Jp"/>
-                                </connections>
-                            </button>
-                        </subviews>
-                        <constraints>
-                            <constraint firstItem="rDS-Bm-rxW" firstAttribute="leading" secondItem="scn-J3-H0V" secondAttribute="leading" constant="16" id="CDi-Lt-pfU"/>
-                            <constraint firstItem="rDS-Bm-rxW" firstAttribute="top" secondItem="scn-J3-H0V" secondAttribute="top" constant="11" id="LIS-AY-YUh"/>
-                            <constraint firstAttribute="bottom" secondItem="rDS-Bm-rxW" secondAttribute="bottom" constant="11" id="eV0-qt-mpH"/>
                         </constraints>
                     </view>
                 </box>
