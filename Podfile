@@ -1,4 +1,4 @@
-platform :osx, "10.8"
+platform :osx, "13.0"
 
 source 'https://github.com/MacDownApp/cocoapods-specs.git'  # Patched libraries.
 source 'https://cdn.cocoapods.org/'
@@ -14,7 +14,9 @@ target "MacDown" do
   pod 'LibYAML', '~> 0.1'
   pod 'M13OrderedDictionary', '~> 1.1'
   pod 'MASPreferences', '~> 1.3'
-  pod 'Sparkle', '~> 1.18', :inhibit_warnings => false
+  # 1.27 is the last 1.x line and ships universal (arm64 + x86_64) binaries,
+  # so the app no longer needs Rosetta. Same SUUpdater API as 1.18.
+  pod 'Sparkle', '~> 1.27', :inhibit_warnings => false
 
   # Locked on 0.4.x until we drop 10.8.
   pod 'PAPreferences', '~> 0.4'
@@ -26,4 +28,18 @@ end
 
 target "macdown-cmd" do
   pod 'GBCli', '~> 1.1'
+end
+
+target "MacDownQuickLook" do
+  pod 'hoedown', '~> 3.0.7', :inhibit_warnings => false
+end
+
+# Pod specs still declare 10.x deployment targets, which current Xcode refuses
+# to build. Lift every pod to the app's deployment target.
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    target.build_configurations.each do |config|
+      config.build_settings['MACOSX_DEPLOYMENT_TARGET'] = '13.0'
+    end
+  end
 end

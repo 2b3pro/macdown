@@ -92,8 +92,13 @@
 		85E24E5C1E5019C00056E696 /* MPToolbarController.m in Sources */ = {isa = PBXBuildFile; fileRef = 85E24E5B1E5019C00056E696 /* MPToolbarController.m */; };
 		905EF1A9196164CA00FC3CE9 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 905EF1A8196164CA00FC3CE9 /* Foundation.framework */; };
 		905EF1B7196164F300FC3CE9 /* macdown in Copy Command Line Utility */ = {isa = PBXBuildFile; fileRef = 905EF1A7196164CA00FC3CE9 /* macdown */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		A56797E0EC789BC745985490 /* libPods-MacDownQuickLook.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BF13730C387FF86B397FDFDD /* libPods-MacDownQuickLook.a */; };
 		B5C5C1666A506FEA86435D25 /* libPods-macdown-cmd.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 263367245B2D78A42C2F19D7 /* libPods-macdown-cmd.a */; };
 		EBFE3157737058F5A63699C8 /* libPods-MacDownTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C949FDE45493AE77DAD9BF4 /* libPods-MacDownTests.a */; };
+		QL00000000000000000000A7 /* MPQuickLookPreviewProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = QL00000000000000000000A6 /* MPQuickLookPreviewProvider.m */; };
+		QL00000000000000000000A8 /* hoedown_html_patch.c in Sources */ = {isa = PBXBuildFile; fileRef = 1FBBD4CA194CA36500BB3C88 /* hoedown_html_patch.c */; };
+		QL00000000000000000000A9 /* Styles in Resources */ = {isa = PBXBuildFile; fileRef = 1F9A14EE194EEEDD00D1C6A9 /* Styles */; };
+		QL00000000000000000000AA /* MacDownQuickLook.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = QL00000000000000000000A1 /* MacDownQuickLook.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -125,6 +130,13 @@
 			remoteGlobalIDString = 905EF1A6196164CA00FC3CE9;
 			remoteInfo = "MacDown-cmd";
 		};
+		QL00000000000000000000B0 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1FA6DE191941CC9E000409FB /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = QL00000000000000000000AB;
+			remoteInfo = MacDownQuickLook;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -147,6 +159,17 @@
 				905EF1B7196164F300FC3CE9 /* macdown in Copy Command Line Utility */,
 			);
 			name = "Copy Command Line Utility";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		QL00000000000000000000AF /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				QL00000000000000000000AA /* MacDownQuickLook.appex in Embed App Extensions */,
+			);
+			name = "Embed App Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
@@ -508,6 +531,8 @@
 		8CDC5EA0050D2F722FB1AADD /* Pods-MacDownTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MacDownTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-MacDownTests/Pods-MacDownTests.debug.xcconfig"; sourceTree = "<group>"; };
 		905EF1A7196164CA00FC3CE9 /* macdown */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = macdown; sourceTree = BUILT_PRODUCTS_DIR; };
 		905EF1A8196164CA00FC3CE9 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		BD804500E4AEF2A6A9BB5D74 /* Pods-MacDownQuickLook.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MacDownQuickLook.debug.xcconfig"; path = "Pods/Target Support Files/Pods-MacDownQuickLook/Pods-MacDownQuickLook.debug.xcconfig"; sourceTree = "<group>"; };
+		BF13730C387FF86B397FDFDD /* libPods-MacDownQuickLook.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-MacDownQuickLook.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E70ECDD4241C933C00537A46 /* ru-RU */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "ru-RU"; path = "Localization/ru-RU.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		E70ECDD5241C933C00537A46 /* ru-RU */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "ru-RU"; path = "Localization/ru-RU.lproj/MainMenu.strings"; sourceTree = "<group>"; };
 		E70ECDD6241C933C00537A46 /* ru-RU */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "ru-RU"; path = "Localization/ru-RU.lproj/MPMarkdownPreferencesViewController.strings"; sourceTree = "<group>"; };
@@ -533,6 +558,12 @@
 		E77E5D72241C935100699B5A /* da-DK */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "da-DK"; path = "Localization/da-DK.lproj/MPDocument.strings"; sourceTree = "<group>"; };
 		E7D458CB241C933800411A36 /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = Localization/fi.lproj/MainMenu.strings; sourceTree = "<group>"; };
 		E7DD09F1241C9368008FBC25 /* da */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = da; path = Localization/da.lproj/MainMenu.strings; sourceTree = "<group>"; };
+		F7A17D8B017F5A972F461408 /* Pods-MacDownQuickLook.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MacDownQuickLook.release.xcconfig"; path = "Pods/Target Support Files/Pods-MacDownQuickLook/Pods-MacDownQuickLook.release.xcconfig"; sourceTree = "<group>"; };
+		QL00000000000000000000A1 /* MacDownQuickLook.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = MacDownQuickLook.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		QL00000000000000000000A3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		QL00000000000000000000A4 /* MacDownQuickLook.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MacDownQuickLook.entitlements; sourceTree = "<group>"; };
+		QL00000000000000000000A5 /* MPQuickLookPreviewProvider.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MPQuickLookPreviewProvider.h; sourceTree = "<group>"; };
+		QL00000000000000000000A6 /* MPQuickLookPreviewProvider.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MPQuickLookPreviewProvider.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -563,6 +594,14 @@
 			files = (
 				905EF1A9196164CA00FC3CE9 /* Foundation.framework in Frameworks */,
 				B5C5C1666A506FEA86435D25 /* libPods-macdown-cmd.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		QL00000000000000000000AD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A56797E0EC789BC745985490 /* libPods-MacDownQuickLook.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -764,6 +803,7 @@
 				1FCDC9EB1944F89B00B1F966 /* MacDown */,
 				1FCDCA2F1944F96E00B1F966 /* MacDownTests */,
 				905EF1AA196164CA00FC3CE9 /* macdown-cmd */,
+				QL00000000000000000000A2 /* MacDownQuickLook */,
 				1FA6DE231941CC9E000409FB /* Frameworks */,
 				1FA6DE221941CC9E000409FB /* Products */,
 				AC6D1A361B8B63012D598BC7 /* Pods */,
@@ -777,6 +817,7 @@
 				1FA6DE211941CC9E000409FB /* MacDown.app */,
 				1FA6DE451941CC9E000409FB /* MacDownTests.xctest */,
 				905EF1A7196164CA00FC3CE9 /* macdown */,
+				QL00000000000000000000A1 /* MacDownQuickLook.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -794,6 +835,7 @@
 				42F926DD38559C7CEDB6E42F /* libPods-MacDown.a */,
 				3C949FDE45493AE77DAD9BF4 /* libPods-MacDownTests.a */,
 				263367245B2D78A42C2F19D7 /* libPods-macdown-cmd.a */,
+				BF13730C387FF86B397FDFDD /* libPods-MacDownQuickLook.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -907,8 +949,21 @@
 				0D0EC0DE9FEA22F962083921 /* Pods-MacDownTests.release.xcconfig */,
 				4DBAA63927A60EB2150642B3 /* Pods-macdown-cmd.debug.xcconfig */,
 				7A8EA75FA95818275755F0B6 /* Pods-macdown-cmd.release.xcconfig */,
+				BD804500E4AEF2A6A9BB5D74 /* Pods-MacDownQuickLook.debug.xcconfig */,
+				F7A17D8B017F5A972F461408 /* Pods-MacDownQuickLook.release.xcconfig */,
 			);
 			name = Pods;
+			sourceTree = "<group>";
+		};
+		QL00000000000000000000A2 /* MacDownQuickLook */ = {
+			isa = PBXGroup;
+			children = (
+				QL00000000000000000000A5 /* MPQuickLookPreviewProvider.h */,
+				QL00000000000000000000A6 /* MPQuickLookPreviewProvider.m */,
+				QL00000000000000000000A3 /* Info.plist */,
+				QL00000000000000000000A4 /* MacDownQuickLook.entitlements */,
+			);
+			path = MacDownQuickLook;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -924,6 +979,7 @@
 				1FF16580199A6C950080D9A5 /* Fetch Prism Resources */,
 				E7FD807B2106CA8F0087F0A8 /* Transpile Styles */,
 				1FA6DE1F1941CC9E000409FB /* Resources */,
+				QL00000000000000000000AF /* Embed App Extensions */,
 				1F8A82A81952F19B00B6BF69 /* Update Build Number */,
 				905EF1B6196164E300FC3CE9 /* Copy Command Line Utility */,
 				C5B8C48273E72106885CA8C4 /* [CP] Embed Pods Frameworks */,
@@ -932,6 +988,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				QL00000000000000000000B1 /* PBXTargetDependency */,
 				905EF1B5196164DD00FC3CE9 /* PBXTargetDependency */,
 				1FE2197819534A5D00DB931F /* PBXTargetDependency */,
 			);
@@ -977,6 +1034,25 @@
 			productName = "MacDown-cmd";
 			productReference = 905EF1A7196164CA00FC3CE9 /* macdown */;
 			productType = "com.apple.product-type.tool";
+		};
+		QL00000000000000000000AB /* MacDownQuickLook */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = QL00000000000000000000B4 /* Build configuration list for PBXNativeTarget "MacDownQuickLook" */;
+			buildPhases = (
+				71CDC741B2AAE15AF511A774 /* [CP] Check Pods Manifest.lock */,
+				QL00000000000000000000AC /* Sources */,
+				QL00000000000000000000AD /* Frameworks */,
+				QL00000000000000000000AE /* Resources */,
+				QL00000000000000000000B5 /* Update Build Number */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = MacDownQuickLook;
+			productName = MacDownQuickLook;
+			productReference = QL00000000000000000000A1 /* MacDownQuickLook.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -1042,6 +1118,7 @@
 			targets = (
 				1FA6DE201941CC9E000409FB /* MacDown */,
 				1FA6DE441941CC9E000409FB /* MacDownTests */,
+				QL00000000000000000000AB /* MacDownQuickLook */,
 				905EF1A6196164CA00FC3CE9 /* macdown-cmd */,
 			);
 		};
@@ -1092,6 +1169,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		QL00000000000000000000AE /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				QL00000000000000000000A9 /* Styles in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
@@ -1115,10 +1200,12 @@
 		};
 		1F8A82A81952F19B00B6BF69 /* Update Build Number */ = {
 			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
+				"$(TARGET_BUILD_DIR)/$(INFOPLIST_PATH)",
 			);
 			name = "Update Build Number";
 			outputPaths = (
@@ -1179,6 +1266,28 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
+		71CDC741B2AAE15AF511A774 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-MacDownQuickLook-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
 		B4334ECDC0751C835C1600D7 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -1229,6 +1338,22 @@
 			shellPath = /bin/sh;
 			shellScript = "make -C \"$PROJECT_DIR/Tools/GitHub-style-generator/\"\n";
 			showEnvVarsInLog = 0;
+		};
+		QL00000000000000000000B5 /* Update Build Number */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"$(TARGET_BUILD_DIR)/$(INFOPLIST_PATH)",
+			);
+			name = "Update Build Number";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "bash Tools/update_build_number.sh\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -1301,6 +1426,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		QL00000000000000000000AC /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				QL00000000000000000000A7 /* MPQuickLookPreviewProvider.m in Sources */,
+				QL00000000000000000000A8 /* hoedown_html_patch.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -1323,6 +1457,11 @@
 			isa = PBXTargetDependency;
 			target = 905EF1A6196164CA00FC3CE9 /* macdown-cmd */;
 			targetProxy = 905EF1B4196164DD00FC3CE9 /* PBXContainerItemProxy */;
+		};
+		QL00000000000000000000B1 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = QL00000000000000000000AB /* MacDownQuickLook */;
+			targetProxy = QL00000000000000000000B0 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -1666,7 +1805,13 @@
 			sourceTree = "<group>";
 		};
 		7A03D96B2F562C1A009801A7 /* MPPDFPreferencesViewController.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
 				7A03D96C2F562C1A009801A7 /* Base */,
+			);
+			name = MPPDFPreferencesViewController.xib;
+			sourceTree = "<group>";
+		};
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
@@ -1883,6 +2028,64 @@
 			};
 			name = Release;
 		};
+		QL00000000000000000000B2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = BD804500E4AEF2A6A9BB5D74 /* Pods-MacDownQuickLook.debug.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = MacDownQuickLook/MacDownQuickLook.entitlements;
+				CODE_SIGN_IDENTITY = "-";
+				COMBINE_HIDPI_IMAGES = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/MacDown/Code/Extension",
+				);
+				INFOPLIST_FILE = MacDownQuickLook/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @executable_path/../../../../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-framework",
+					QuickLookUI,
+					"-framework",
+					UniformTypeIdentifiers,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.uranusjr.macdown-debug.quicklook";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				WRAPPER_EXTENSION = appex;
+			};
+			name = Debug;
+		};
+		QL00000000000000000000B3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = F7A17D8B017F5A972F461408 /* Pods-MacDownQuickLook.release.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = MacDownQuickLook/MacDownQuickLook.entitlements;
+				CODE_SIGN_IDENTITY = "-";
+				COMBINE_HIDPI_IMAGES = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/MacDown/Code/Extension",
+				);
+				INFOPLIST_FILE = MacDownQuickLook/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @executable_path/../../../../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-framework",
+					QuickLookUI,
+					"-framework",
+					UniformTypeIdentifiers,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.uranusjr.macdown.quicklook;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				WRAPPER_EXTENSION = appex;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -1918,6 +2121,15 @@
 			buildConfigurations = (
 				905EF1B1196164CA00FC3CE9 /* Debug */,
 				905EF1B2196164CA00FC3CE9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		QL00000000000000000000B4 /* Build configuration list for PBXNativeTarget "MacDownQuickLook" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				QL00000000000000000000B2 /* Debug */,
+				QL00000000000000000000B3 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
