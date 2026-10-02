@@ -135,7 +135,7 @@ Fork maintained by [Ian Shen](https://github.com/2b3pro).
 
 ## Support
 
-Macdown is free and always will be. But I won't stop you from buying me a coffee and croissant!
+MacDown is free and always will be. But I won't stop you from buying me a coffee and croissant for my fork of MacDown!
 
 <a href="https://paypal.me/2b3/5">
   <img src="https://img.shields.io/badge/Donate-PayPal-blue.svg" alt="Donate with PayPal" />
