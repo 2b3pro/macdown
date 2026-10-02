@@ -9,8 +9,7 @@
 #import "MPDocument.h"
 #import <WebKit/WebKit.h>
 #import <JJPluralForm/JJPluralForm.h>
-#import <hoedown/html.h>
-#import "hoedown_html_patch.h"
+#import "MPMarkdown.h"
 #import "HGMarkdownHighlighter.h"
 #import "MPUtilities.h"
 #import "MPAutosaving.h"
@@ -125,34 +124,30 @@ NS_INLINE NSColor *MPGetWebViewBackgroundColor(WebView *webview)
 @end
 
 
-@implementation MPPreferences (Hoedown)
+@implementation MPPreferences (Rendering)
 - (int)extensionFlags
 {
+    // Fenced code blocks and intra-word emphasis rules are part of
+    // CommonMark itself, so those preferences no longer change parsing.
     int flags = 0;
     if (self.extensionAutolink)
-        flags |= HOEDOWN_EXT_AUTOLINK;
-    if (self.extensionFencedCode)
-        flags |= HOEDOWN_EXT_FENCED_CODE;
+        flags |= MPMarkdownExtensionAutolink;
     if (self.extensionFootnotes)
-        flags |= HOEDOWN_EXT_FOOTNOTES;
+        flags |= MPMarkdownExtensionFootnotes;
     if (self.extensionHighlight)
-        flags |= HOEDOWN_EXT_HIGHLIGHT;
-    if (!self.extensionIntraEmphasis)
-        flags |= HOEDOWN_EXT_NO_INTRA_EMPHASIS;
-    if (self.extensionQuote)
-        flags |= HOEDOWN_EXT_QUOTE;
+        flags |= MPMarkdownExtensionHighlight;
     if (self.extensionStrikethough)
-        flags |= HOEDOWN_EXT_STRIKETHROUGH;
+        flags |= MPMarkdownExtensionStrikethrough;
     if (self.extensionSuperscript)
-        flags |= HOEDOWN_EXT_SUPERSCRIPT;
+        flags |= MPMarkdownExtensionSuperscript;
     if (self.extensionTables)
-        flags |= HOEDOWN_EXT_TABLES;
+        flags |= MPMarkdownExtensionTables;
     if (self.extensionUnderline)
-        flags |= HOEDOWN_EXT_UNDERLINE;
+        flags |= MPMarkdownExtensionUnderline;
     if (self.htmlMathJax)
-        flags |= HOEDOWN_EXT_MATH;
+        flags |= MPMarkdownExtensionMath;
     if (self.htmlMathJaxInlineDollar)
-        flags |= HOEDOWN_EXT_MATH_EXPLICIT;
+        flags |= MPMarkdownExtensionMathInlineDollar;
     return flags;
 }
 
@@ -160,13 +155,13 @@ NS_INLINE NSColor *MPGetWebViewBackgroundColor(WebView *webview)
 {
     int flags = 0;
     if (self.htmlTaskList)
-        flags |= HOEDOWN_HTML_USE_TASK_LIST;
+        flags |= MPMarkdownRenderTaskList;
     if (self.htmlLineNumbers)
-        flags |= HOEDOWN_HTML_BLOCKCODE_LINE_NUMBERS;
+        flags |= MPMarkdownRenderLineNumbers;
     if (self.htmlHardWrap)
-        flags |= HOEDOWN_HTML_HARD_WRAP;
+        flags |= MPMarkdownRenderHardWrap;
     if (self.htmlCodeBlockAccessory == MPCodeBlockAccessoryCustom)
-        flags |= HOEDOWN_HTML_BLOCKCODE_INFORMATION;
+        flags |= MPMarkdownRenderCodeBlockInformation;
     return flags;
 }
 @end

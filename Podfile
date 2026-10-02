@@ -9,7 +9,7 @@ inhibit_all_warnings!
 
 target "MacDown" do
   pod 'handlebars-objc', '~> 1.4'
-  pod 'hoedown', '~> 3.0.7', :inhibit_warnings => false
+  pod 'cmark-gfm', :path => 'Dependency/cmark-gfm'
   pod 'JJPluralForm', '~> 2.1'
   pod 'LibYAML', '~> 0.1'
   pod 'M13OrderedDictionary', '~> 1.1'
@@ -31,7 +31,7 @@ target "macdown-cmd" do
 end
 
 target "MacDownQuickLook" do
-  pod 'hoedown', '~> 3.0.7', :inhibit_warnings => false
+  pod 'cmark-gfm', :path => 'Dependency/cmark-gfm'
 end
 
 # Pod specs still declare 10.x deployment targets, which current Xcode refuses

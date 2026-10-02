@@ -192,7 +192,7 @@ This is where I keep all preferences related to how I parse markdown into html.
 ![Markdown preferences pane](https://d.pr/i/RQEi+)
 
 ### Document Formatting
-The ***Smartypants*** extension automatically transforms straight quotes (`"` and `'`) in your text into typographer’s quotes (`“`, `”`, `‘`, and `’`) according to the context. Very useful if you’re a typography freak like I am. Quote and Smartypants are syntactically incompatible. If both are enabled, Quote takes precedence.
+The ***Smartypants*** extension automatically transforms straight quotes (`"` and `'`) in your text into typographer’s quotes (`“`, `”`, `‘`, and `’`) according to the context. It also turns `--` into an en dash, `---` into an em dash, and `...` into an ellipsis. Very useful if you’re a typography freak like I am.
 
 
 ### Block Formatting
@@ -244,10 +244,8 @@ The following is a list of optional inline markups supported:
 
 Option name         | Markup           | Result if enabled     |
 --------------------|------------------|-----------------------|
-Intra-word emphasis | So A\*maz\*ing   | So A<em>maz</em>ing   |
 Strikethrough       | \~~Much wow\~~   | <del>Much wow</del>   |
 Underline [^under]  | \_So doge\_      | <u>So doge</u>        |
-Quote [^quote]      | \"Such editor\"  | <q>Such editor</q>    |
 Highlight           | \==So good\==    | <mark>So good</mark>  |
 Superscript         | hoge\^(fuga)     | hoge<sup>fuga</sup>   |
 Autolink            | http://t.co      | <http://t.co>         |
@@ -351,7 +349,6 @@ Happy writing!
 
 [^under]: If **Underline** is disabled `_this_` will be rendered as *emphasized* instead of being underlined.
 
-[^quote]: **Quote** replaces literal `"` characters with html `<q>` tags. **Quote** and **Smartypants** are syntactically incompatible. If both are enabled, **Quote** takes precedence. Note that **Quote** is different from *blockquote*, which is part of standard Markdown.
 
 [^math]: Internet connection required.
 

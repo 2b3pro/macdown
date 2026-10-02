@@ -33,27 +33,12 @@
                                     <binding destination="-2" name="value" keyPath="self.preferences.extensionTables" id="b0l-i3-TQN"/>
                                 </connections>
                             </button>
-                            <button translatesAutoresizingMaskIntoConstraints="NO" id="fhk-gr-iF0">
-                                <rect key="frame" x="16" y="11" width="541" height="16"/>
-                                <buttonCell key="cell" type="check" title="Fenced code block" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="ELg-sx-vIf">
-                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <connections>
-                                    <binding destination="-2" name="value" keyPath="self.preferences.extensionFencedCode" id="7xl-hC-c69"/>
-                                </connections>
-                            </button>
                         </subviews>
                         <constraints>
                             <constraint firstItem="J8u-0k-Z3s" firstAttribute="top" secondItem="YjE-mG-z1L" secondAttribute="top" constant="11" id="2lc-DW-rD3"/>
-                            <constraint firstAttribute="trailing" secondItem="fhk-gr-iF0" secondAttribute="trailing" constant="16" id="5eI-GF-UXZ"/>
-                            <constraint firstItem="fhk-gr-iF0" firstAttribute="top" secondItem="J8u-0k-Z3s" secondAttribute="bottom" constant="6" symbolic="YES" id="GWV-8n-o6t"/>
-                            <constraint firstItem="J8u-0k-Z3s" firstAttribute="leading" secondItem="fhk-gr-iF0" secondAttribute="leading" id="gA1-jc-5wE"/>
-                            <constraint firstItem="J8u-0k-Z3s" firstAttribute="width" secondItem="fhk-gr-iF0" secondAttribute="width" id="hpH-SM-7Qs"/>
                             <constraint firstItem="J8u-0k-Z3s" firstAttribute="leading" secondItem="YjE-mG-z1L" secondAttribute="leading" constant="16" id="sxv-pN-hEA"/>
-                            <constraint firstItem="fhk-gr-iF0" firstAttribute="top" secondItem="J8u-0k-Z3s" secondAttribute="bottom" constant="6" id="tpL-U4-UGM"/>
                             <constraint firstAttribute="trailing" secondItem="J8u-0k-Z3s" secondAttribute="trailing" constant="16" id="x8m-Hz-ZhG"/>
-                            <constraint firstAttribute="bottom" secondItem="fhk-gr-iF0" secondAttribute="bottom" constant="11" id="yB4-Hp-9oW"/>
+                            <constraint firstAttribute="bottom" secondItem="J8u-0k-Z3s" secondAttribute="bottom" constant="11" id="mdC-bt-T11"/>
                         </constraints>
                     </view>
                 </box>
@@ -107,26 +92,6 @@
                                     <binding destination="-2" name="value" keyPath="self.preferences.extensionUnderline" id="hZM-bR-fRh"/>
                                 </connections>
                             </button>
-                            <button translatesAutoresizingMaskIntoConstraints="NO" id="gtf-xR-sKM">
-                                <rect key="frame" x="16" y="99" width="147" height="16"/>
-                                <buttonCell key="cell" type="check" title="Quote" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="2lB-hq-5eX">
-                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <connections>
-                                    <binding destination="-2" name="value" keyPath="self.preferences.extensionQuote" id="whB-Ub-bc4"/>
-                                </connections>
-                            </button>
-                            <button translatesAutoresizingMaskIntoConstraints="NO" id="tqY-25-uOh">
-                                <rect key="frame" x="16" y="165" width="147" height="16"/>
-                                <buttonCell key="cell" type="check" title="Intra-word emphasis" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="D7l-nP-P0y">
-                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <connections>
-                                    <binding destination="-2" name="value" keyPath="self.preferences.extensionIntraEmphasis" id="7LU-84-OdM"/>
-                                </connections>
-                            </button>
                             <button translatesAutoresizingMaskIntoConstraints="NO" id="lYF-J6-3YU">
                                 <rect key="frame" x="16" y="55" width="147" height="16"/>
                                 <buttonCell key="cell" type="check" title="Superscript" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="k2n-VN-cKT">
@@ -169,31 +134,25 @@
                             </button>
                         </subviews>
                         <constraints>
-                            <constraint firstItem="tqY-25-uOh" firstAttribute="width" secondItem="QMR-TV-GNi" secondAttribute="width" id="3dX-gu-pDA"/>
-                            <constraint firstItem="tqY-25-uOh" firstAttribute="width" secondItem="gtf-xR-sKM" secondAttribute="width" id="6Rd-ZM-kFZ"/>
-                            <constraint firstItem="tqY-25-uOh" firstAttribute="width" secondItem="T31-Sx-beD" secondAttribute="width" id="793-kg-eP4"/>
-                            <constraint firstItem="tqY-25-uOh" firstAttribute="leading" secondItem="gtf-xR-sKM" secondAttribute="leading" id="7G3-fv-Bwg"/>
-                            <constraint firstItem="gtf-xR-sKM" firstAttribute="top" secondItem="CCI-wC-lHw" secondAttribute="bottom" constant="6" id="ENl-He-M1e"/>
-                            <constraint firstAttribute="trailing" secondItem="tqY-25-uOh" secondAttribute="trailing" constant="16" id="IBy-ZL-0VX"/>
-                            <constraint firstItem="tqY-25-uOh" firstAttribute="leading" secondItem="wTw-go-erC" secondAttribute="leading" constant="16" id="JML-J3-nyi"/>
-                            <constraint firstItem="iwB-ah-rER" firstAttribute="top" secondItem="tqY-25-uOh" secondAttribute="bottom" constant="6" id="JaZ-rX-DQh"/>
+                            <constraint firstItem="iwB-ah-rER" firstAttribute="width" secondItem="QMR-TV-GNi" secondAttribute="width" id="3dX-gu-pDA"/>
+                            <constraint firstItem="iwB-ah-rER" firstAttribute="width" secondItem="T31-Sx-beD" secondAttribute="width" id="793-kg-eP4"/>
+                            <constraint firstAttribute="trailing" secondItem="iwB-ah-rER" secondAttribute="trailing" constant="16" id="IBy-ZL-0VX"/>
+                            <constraint firstItem="iwB-ah-rER" firstAttribute="leading" secondItem="wTw-go-erC" secondAttribute="leading" constant="16" id="JML-J3-nyi"/>
                             <constraint firstAttribute="bottom" secondItem="Y8p-KQ-Vis" secondAttribute="bottom" constant="11" id="JtX-0K-G8t"/>
                             <constraint firstItem="lYF-J6-3YU" firstAttribute="top" secondItem="QMR-TV-GNi" secondAttribute="bottom" constant="6" id="KvZ-Uz-Q9R"/>
                             <constraint firstItem="CCI-wC-lHw" firstAttribute="top" secondItem="iwB-ah-rER" secondAttribute="bottom" constant="6" id="NdM-5P-atE"/>
-                            <constraint firstItem="tqY-25-uOh" firstAttribute="width" secondItem="lYF-J6-3YU" secondAttribute="width" id="Ngh-78-6G6"/>
-                            <constraint firstItem="tqY-25-uOh" firstAttribute="top" secondItem="wTw-go-erC" secondAttribute="top" constant="11" id="WfH-CD-pNO"/>
-                            <constraint firstItem="tqY-25-uOh" firstAttribute="width" secondItem="iwB-ah-rER" secondAttribute="width" id="b6r-9U-Ka5"/>
-                            <constraint firstItem="tqY-25-uOh" firstAttribute="leading" secondItem="CCI-wC-lHw" secondAttribute="leading" id="bXa-Ro-SyE"/>
-                            <constraint firstItem="tqY-25-uOh" firstAttribute="leading" secondItem="lYF-J6-3YU" secondAttribute="leading" id="bfe-nk-zKL"/>
-                            <constraint firstItem="QMR-TV-GNi" firstAttribute="top" secondItem="gtf-xR-sKM" secondAttribute="bottom" constant="6" id="mqF-rq-2sm"/>
-                            <constraint firstItem="tqY-25-uOh" firstAttribute="leading" secondItem="Y8p-KQ-Vis" secondAttribute="leading" id="nV1-bH-j5P"/>
-                            <constraint firstItem="tqY-25-uOh" firstAttribute="width" secondItem="Y8p-KQ-Vis" secondAttribute="width" id="oA4-JX-AZO"/>
-                            <constraint firstItem="tqY-25-uOh" firstAttribute="width" secondItem="CCI-wC-lHw" secondAttribute="width" id="phQ-Cl-2Wb"/>
-                            <constraint firstItem="tqY-25-uOh" firstAttribute="leading" secondItem="T31-Sx-beD" secondAttribute="leading" id="qPH-8x-0yD"/>
+                            <constraint firstItem="iwB-ah-rER" firstAttribute="width" secondItem="lYF-J6-3YU" secondAttribute="width" id="Ngh-78-6G6"/>
+                            <constraint firstItem="iwB-ah-rER" firstAttribute="top" secondItem="wTw-go-erC" secondAttribute="top" constant="11" id="WfH-CD-pNO"/>
+                            <constraint firstItem="iwB-ah-rER" firstAttribute="leading" secondItem="CCI-wC-lHw" secondAttribute="leading" id="bXa-Ro-SyE"/>
+                            <constraint firstItem="iwB-ah-rER" firstAttribute="leading" secondItem="lYF-J6-3YU" secondAttribute="leading" id="bfe-nk-zKL"/>
+                            <constraint firstItem="QMR-TV-GNi" firstAttribute="top" secondItem="CCI-wC-lHw" secondAttribute="bottom" constant="6" id="mqF-rq-2sm"/>
+                            <constraint firstItem="iwB-ah-rER" firstAttribute="leading" secondItem="Y8p-KQ-Vis" secondAttribute="leading" id="nV1-bH-j5P"/>
+                            <constraint firstItem="iwB-ah-rER" firstAttribute="width" secondItem="Y8p-KQ-Vis" secondAttribute="width" id="oA4-JX-AZO"/>
+                            <constraint firstItem="iwB-ah-rER" firstAttribute="width" secondItem="CCI-wC-lHw" secondAttribute="width" id="phQ-Cl-2Wb"/>
+                            <constraint firstItem="iwB-ah-rER" firstAttribute="leading" secondItem="T31-Sx-beD" secondAttribute="leading" id="qPH-8x-0yD"/>
                             <constraint firstItem="Y8p-KQ-Vis" firstAttribute="top" secondItem="T31-Sx-beD" secondAttribute="bottom" constant="6" id="qca-bh-fV2"/>
                             <constraint firstItem="T31-Sx-beD" firstAttribute="top" secondItem="lYF-J6-3YU" secondAttribute="bottom" constant="6" id="sa2-1e-2Xh"/>
-                            <constraint firstItem="tqY-25-uOh" firstAttribute="leading" secondItem="QMR-TV-GNi" secondAttribute="leading" id="sgT-GA-YPl"/>
-                            <constraint firstItem="tqY-25-uOh" firstAttribute="leading" secondItem="iwB-ah-rER" secondAttribute="leading" id="vpS-tR-3bY"/>
+                            <constraint firstItem="iwB-ah-rER" firstAttribute="leading" secondItem="QMR-TV-GNi" secondAttribute="leading" id="sgT-GA-YPl"/>
                         </constraints>
                     </view>
                 </box>
