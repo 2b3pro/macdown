@@ -1,9 +1,13 @@
 ALL: version.h
 
-version.h:
+# Regenerated on every build so the macdown command line tool reports the
+# current version. The script only rewrites version.h when it changes.
+version.h: FORCE
 	bash ../../Tools/generate_version_header.sh
 
-.PHONY: install clean distclean
+FORCE:
+
+.PHONY: install clean distclean FORCE
 
 install: ALL
 

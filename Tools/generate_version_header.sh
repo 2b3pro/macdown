@@ -14,4 +14,12 @@ static const char * const kMPApplicationShortVersion = \"$SHORT_VERSION\";
 static const char * const kMPApplicationBundleVersion = \"$BUNDLE_VERSION\";
 
 #endif
-" > version.h
+" > version.h.tmp
+
+# Replace version.h only when the version changed, so its timestamp (and the
+# command line tool's rebuild) only moves when it has to.
+if cmp -s version.h.tmp version.h; then
+    rm version.h.tmp
+else
+    mv version.h.tmp version.h
+fi
