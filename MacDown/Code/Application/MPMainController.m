@@ -271,6 +271,14 @@ NS_INLINE void treat()
     return [NSBundle mainBundle].infoDictionary[@"SUFeedURL"];
 }
 
+// This fork has no update feed yet (SUFeedURL is not set), so never check;
+// in particular not against upstream's feed, which settings copied from
+// upstream MacDown may still point Sparkle at.
+- (BOOL)updaterMayCheckForUpdates:(SUUpdater *)updater
+{
+    return [self feedURLStringForUpdater:updater].length > 0;
+}
+
 
 #pragma mark - Private
 
