@@ -33,6 +33,7 @@ Upstream has been quiet since 2020, and its last release (0.7.3) ships an Intel-
 
 * YAML front matter is stripped from the preview and from printed output instead of being rendered as a table.
 * New **GitHub-2020** preview style.
+* Mermaid updated from 8.4.3 to 12.1.0, adding mindmaps, timelines, XY charts, Sankey, block, architecture, and the other newer diagram types. Diagrams follow the preview style's light or dark background instead of always using the "forest" theme. Turn it on with **Rendering > Mermaid** (requires syntax highlighting).
 
 **Preferences window**
 

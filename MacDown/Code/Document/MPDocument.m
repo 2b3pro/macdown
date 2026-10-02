@@ -216,6 +216,7 @@ typedef NS_ENUM(NSUInteger, MPWordCountType) {
 @property (strong) NSURL *pendingPDFExportURL;
 @property (strong) NSURL *pendingPrintTempURL;
 @property (nonatomic) BOOL renderToWebPending;
+@property (nonatomic) NSInteger previewPendingRenderTasks;
 @property (strong) NSArray<NSNumber *> *webViewHeaderLocations;
 @property (strong) NSArray<NSNumber *> *editorHeaderLocations;
 @property (nonatomic) BOOL inLiveScroll;
@@ -982,27 +983,47 @@ static void (^MPGetPreviewLoadingCompletionHandler(MPDocument *doc))()
             [window disableFlushWindow];
     }
 
-    // If MathJax is off, the on-completion callback will be invoked directly
-    // when loading is done (in -webView:didFinishLoadForFrame:).
+    // The on-completion callback runs once the page itself has loaded (in
+    // -webView:didFinishLoadForFrame:) and every asynchronous renderer on the
+    // page (MathJax, Mermaid) has reported back through its listener.
+    self.previewPendingRenderTasks = 1;
+    __weak MPDocument *weakSelf = self;
+    void (^taskDone)(void) = ^{
+        [weakSelf previewRenderTaskDidFinish];
+    };
     if (self.preferences.htmlMathJax)
     {
+        self.previewPendingRenderTasks++;
         MPMathJaxListener *listener = [[MPMathJaxListener alloc] init];
-        [listener addCallback:MPGetPreviewLoadingCompletionHandler(self)
-                       forKey:@"End"];
+        [listener addCallback:taskDone forKey:@"End"];
         [sender.windowScriptObject setValue:listener forKey:@"MathJaxListener"];
     }
+    // Mermaid scripts are only included alongside syntax highlighting.
+    if (self.preferences.htmlSyntaxHighlighting && self.preferences.htmlMermaid)
+    {
+        self.previewPendingRenderTasks++;
+        MPMathJaxListener *listener = [[MPMathJaxListener alloc] init];
+        [listener addCallback:taskDone forKey:@"End"];
+        [sender.windowScriptObject setValue:listener forKey:@"MermaidListener"];
+    }
+}
+
+- (void)previewRenderTaskDidFinish
+{
+    if (self.previewPendingRenderTasks <= 0)
+        return;
+    self.previewPendingRenderTasks--;
+    if (self.previewPendingRenderTasks > 0)
+        return;
+
+    id callback = MPGetPreviewLoadingCompletionHandler(self);
+    NSOperationQueue *queue = [NSOperationQueue mainQueue];
+    [queue addOperationWithBlock:callback];
 }
 
 - (void)webView:(WebView *)sender didFinishLoadForFrame:(WebFrame *)frame
 {
-    // If MathJax is on, the on-completion callback will be invoked by the
-    // JavaScript handler injected in -webView:didCommitLoadForFrame:.
-    if (!self.preferences.htmlMathJax)
-    {
-        id callback = MPGetPreviewLoadingCompletionHandler(self);
-        NSOperationQueue *queue = [NSOperationQueue mainQueue];
-        [queue addOperationWithBlock:callback];
-    }
+    [self previewRenderTaskDidFinish];
 
     self.isPreviewReady = YES;
 
