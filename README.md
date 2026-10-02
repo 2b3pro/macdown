@@ -45,7 +45,7 @@ Upstream has been quiet since 2020, and its last release (0.7.3) ships an Intel-
 
 ### Rendering and preferences
 
-* YAML front matter is stripped from the preview and from printed output instead of being rendered as a table.
+* YAML front matter (a `---` block at the very top of the file) is stripped from the preview, Quick Look and printed output instead of being rendered as a table. Its `title` is used as the document title. Turn it off with **Rendering > Detect Jekyll front-matter**.
 * New **GitHub-2020** preview style.
 * Mermaid updated from 8.4.3 to 12.1.0, adding mindmaps, timelines, XY charts, Sankey, block, architecture, and the other newer diagram types. Diagrams follow the preview style's light or dark background instead of always using the "forest" theme.
 * Preference panels use Auto Layout and keep a consistent width when switching between them.
@@ -144,6 +144,10 @@ Footnotes are on by default.[^parser] Write the note anywhere in the document; M
 ### Table of contents
 
 With **Rendering > Detect table of contents token** on, a paragraph containing only `[TOC]` becomes a linked outline of the document's headings.
+
+### Front matter
+
+A YAML front matter block at the top of a file (as used by Jekyll, Hugo and many note apps) is hidden from the preview and from exports, so metadata never shows up as stray text.
 
 ### Collapsible sections
 
