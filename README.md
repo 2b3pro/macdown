@@ -29,6 +29,13 @@ Upstream has been quiet since 2020, and its last release (0.7.3) ships an Intel-
 * Margins now follow **File > Page Setup** instead of hardcoded values, and the bundled stylesheets no longer add their own print margins, so whitespace is predictable.
 * User-configurable print content padding in the **Rendering** preferences.
 
+**Markdown parser**
+
+* Markdown is now parsed by [cmark-gfm](https://github.com/github/cmark-gfm), GitHub's implementation of CommonMark and GitHub Flavored Markdown, replacing Hoedown. Documents render the way they do on GitHub, and the spec's edge cases (nested lists, emphasis next to punctuation, HTML blocks) behave predictably.
+* Tables, footnotes, strikethrough, autolinks and task lists use the GFM syntax. Highlight (`==text==`), superscript (`^word`, `^(words)`), underline (`_text_`) and math (`$$…$$`, `\\(…\\)`, `\\[…\\]`, and optionally `$…$`) are kept as MacDown extensions, each toggled in **Preferences > Markdown**.
+* MacDown's extensions are small, self-contained cmark-gfm syntax extensions. See [`MacDown/Code/Markdown/Extensions/README.md`](MacDown/Code/Markdown/Extensions/README.md) to write your own.
+* Differences from Hoedown: headings need a space after `#`, a single `~` also strikes through (as on GitHub), footnotes use GitHub's markup, and the rarely used Quote extension (`"text"` to `<q>`) is gone. SmartyPants now handles quotes, dashes and ellipses but no longer converts `(c)`, `(tm)` or fractions.
+
 **Rendering**
 
 * YAML front matter is stripped from the preview and from printed output instead of being rendered as a table.
@@ -107,7 +114,7 @@ If you run into build issues later on, try running the following commands to upd
 ### Targets
 
 * **MacDown**: the application.
-* **MacDownQuickLook**: the Quick Look preview extension, embedded in the app bundle. It compiles Hoedown and MacDown's renderer patches directly, so it stays in sync with the app's rendering.
+* **MacDownQuickLook**: the Quick Look preview extension, embedded in the app bundle. It links cmark-gfm and compiles MacDown's Markdown renderer (`MacDown/Code/Markdown`) directly, so it stays in sync with the app's rendering.
 * **macdown-cmd**: the `macdown` command line utility, copied into the app bundle.
 * **MacDownTests**: unit tests.
 
@@ -123,7 +130,7 @@ Localizations are inherited from upstream, which manages them on [Transifex](htt
 
 Please [file an issue](https://github.com/2b3pro/macdown/issues/new) on this repository for problems with the fork-specific features listed above. **Search first to make sure no-one has reported the same issue already.**
 
-MacDown depends a lot on other open source projects, such as [Hoedown](https://github.com/hoedown/hoedown) for Markdown-to-HTML rendering, [Prism](http://prismjs.com) for syntax highlighting (in code blocks), and [PEG Markdown Highlight](https://github.com/ali-rantakari/peg-markdown-highlight) for editor highlighting. If you find problems when using those particular features, consider reporting them to the upstream projects as well.
+MacDown depends a lot on other open source projects, such as [cmark-gfm](https://github.com/github/cmark-gfm) for Markdown-to-HTML rendering, [Prism](http://prismjs.com) for syntax highlighting (in code blocks), and [PEG Markdown Highlight](https://github.com/ali-rantakari/peg-markdown-highlight) for editor highlighting. If you find problems when using those particular features, consider reporting them to the upstream projects as well.
 
 ## Upstream and credits
 

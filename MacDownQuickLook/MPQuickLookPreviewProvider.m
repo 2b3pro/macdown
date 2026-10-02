@@ -3,18 +3,16 @@
 //  MacDownQuickLook
 //
 //  Data-based Quick Look preview (macOS 12+). Produces a self-contained HTML
-//  document: Markdown body rendered by Hoedown with MacDown's renderer patches,
+//  document: Markdown body rendered by MacDown's renderer (MPMarkdown),
 //  wrapped in the user's selected MacDown style. Quick Look does not execute
 //  JavaScript in HTML previews, so Prism, MathJax and Mermaid are not included.
 //
 
 #import "MPQuickLookPreviewProvider.h"
 #import <UniformTypeIdentifiers/UniformTypeIdentifiers.h>
-#import <hoedown/document.h>
-#import <hoedown/html.h>
 #import <pwd.h>
 #import <unistd.h>
-#import "hoedown_html_patch.h"
+#import "MPMarkdown.h"
 
 
 // Preferences domain of the containing app. Mirrors MPPreferences keys.
@@ -22,8 +20,6 @@ static NSString * const kMPAppDefaultsDomain = @"com.uranusjr.macdown";
 static NSString * const kMPDefaultStyleName = @"GitHub2";
 static NSString * const kMPStylesDirectoryName = @"Styles";
 static NSString * const kMPStyleFileExtension = @"css";
-static size_t kMPRendererNestingLevel = SIZE_MAX;
-static int kMPRendererTOCLevel = 6;  // h1 to h6.
 
 
 #pragma mark - Preferences
@@ -46,43 +42,42 @@ static BOOL MPPreferenceBool(NSString *key, BOOL fallback)
     return fallback;
 }
 
-static int MPExtensionFlags(void)
+// Mirrors -[MPPreferences extensionFlags] in MPDocument.m.
+static unsigned int MPExtensionFlags(void)
 {
-    int flags = 0;
+    unsigned int flags = 0;
     if (MPPreferenceBool(@"extensionAutolink", NO))
-        flags |= HOEDOWN_EXT_AUTOLINK;
-    if (MPPreferenceBool(@"extensionFencedCode", YES))
-        flags |= HOEDOWN_EXT_FENCED_CODE;
+        flags |= MPMarkdownExtensionAutolink;
     if (MPPreferenceBool(@"extensionFootnotes", YES))
-        flags |= HOEDOWN_EXT_FOOTNOTES;
+        flags |= MPMarkdownExtensionFootnotes;
     if (MPPreferenceBool(@"extensionHighlight", NO))
-        flags |= HOEDOWN_EXT_HIGHLIGHT;
-    if (!MPPreferenceBool(@"extensionIntraEmphasis", YES))
-        flags |= HOEDOWN_EXT_NO_INTRA_EMPHASIS;
-    if (MPPreferenceBool(@"extensionQuote", NO))
-        flags |= HOEDOWN_EXT_QUOTE;
+        flags |= MPMarkdownExtensionHighlight;
     if (MPPreferenceBool(@"extensionStrikethough", NO))
-        flags |= HOEDOWN_EXT_STRIKETHROUGH;
+        flags |= MPMarkdownExtensionStrikethrough;
     if (MPPreferenceBool(@"extensionSuperscript", NO))
-        flags |= HOEDOWN_EXT_SUPERSCRIPT;
+        flags |= MPMarkdownExtensionSuperscript;
     if (MPPreferenceBool(@"extensionTables", YES))
-        flags |= HOEDOWN_EXT_TABLES;
+        flags |= MPMarkdownExtensionTables;
     if (MPPreferenceBool(@"extensionUnderline", NO))
-        flags |= HOEDOWN_EXT_UNDERLINE;
+        flags |= MPMarkdownExtensionUnderline;
     if (MPPreferenceBool(@"htmlMathJax", NO))
-        flags |= HOEDOWN_EXT_MATH;
+        flags |= MPMarkdownExtensionMath;
     if (MPPreferenceBool(@"htmlMathJaxInlineDollar", NO))
-        flags |= HOEDOWN_EXT_MATH_EXPLICIT;
+        flags |= MPMarkdownExtensionMathInlineDollar;
     return flags;
 }
 
-static int MPRendererFlags(void)
+static unsigned int MPRendererFlags(void)
 {
-    int flags = 0;
+    unsigned int flags = 0;
     if (MPPreferenceBool(@"htmlTaskList", NO))
-        flags |= HOEDOWN_HTML_USE_TASK_LIST;
+        flags |= MPMarkdownRenderTaskList;
     if (MPPreferenceBool(@"htmlHardWrap", NO))
-        flags |= HOEDOWN_HTML_HARD_WRAP;
+        flags |= MPMarkdownRenderHardWrap;
+    if (MPPreferenceBool(@"extensionSmartyPants", NO))
+        flags |= MPMarkdownRenderSmartyPants;
+    if (MPPreferenceBool(@"htmlRendersTOC", NO))
+        flags |= MPMarkdownRenderTOC;
     // Line numbers and code block accessories need Prism (JavaScript), which
     // Quick Look does not run, so those renderer flags are intentionally off.
     return flags;
@@ -168,75 +163,20 @@ static NSString *MPStripFrontMatter(NSString *markdown)
     return [markdown substringFromIndex:[result rangeAtIndex:0].length];
 }
 
-static NSString *MPStringFromHoedownBuffer(hoedown_buffer *ob)
-{
-    NSString *s = [[NSString alloc] initWithBytes:ob->data length:ob->size
-                                         encoding:NSUTF8StringEncoding];
-    return s ?: @"";
-}
-
-// Mirrors MPHTMLFromMarkdown / MPCreateHTMLRenderer in MPRenderer.m.
 static NSString *MPRenderMarkdownBody(NSString *markdown)
 {
-    int extensions = MPExtensionFlags();
-    BOOL smartypants = MPPreferenceBool(@"extensionSmartyPants", NO);
-    BOOL renderTOC = MPPreferenceBool(@"htmlRendersTOC", NO);
     if (MPPreferenceBool(@"htmlDetectFrontMatter", YES))
         markdown = MPStripFrontMatter(markdown);
 
-    hoedown_renderer *htmlRenderer =
-        hoedown_html_renderer_new(MPRendererFlags(), kMPRendererTOCLevel);
-    htmlRenderer->blockcode = hoedown_patch_render_blockcode;
-    htmlRenderer->listitem = hoedown_patch_render_listitem;
-    hoedown_html_renderer_state_extra *extra =
-        hoedown_malloc(sizeof(hoedown_html_renderer_state_extra));
-    extra->language_addition = NULL;  // No Prism language collection here.
-    extra->owner = NULL;
-    ((hoedown_html_renderer_state *)htmlRenderer->opaque)->opaque = extra;
+    MPMarkdownOptions options = {0};
+    options.extensions = MPExtensionFlags();
+    options.renderFlags = MPRendererFlags();
 
     NSData *input = [markdown dataUsingEncoding:NSUTF8StringEncoding];
-    hoedown_document *document = hoedown_document_new(
-        htmlRenderer, extensions, kMPRendererNestingLevel);
-    hoedown_buffer *ob = hoedown_buffer_new(64);
-    hoedown_document_render(document, ob, input.bytes, input.length);
-    if (smartypants)
-    {
-        hoedown_buffer *ib = ob;
-        ob = hoedown_buffer_new(64);
-        hoedown_html_smartypants(ob, ib->data, ib->size);
-        hoedown_buffer_free(ib);
-    }
-    NSString *result = MPStringFromHoedownBuffer(ob);
-    hoedown_document_free(document);
-    hoedown_buffer_free(ob);
-    free(extra);
-    hoedown_html_renderer_free(htmlRenderer);
-
-    if (renderTOC)
-    {
-        hoedown_renderer *tocRenderer =
-            hoedown_html_toc_renderer_new(kMPRendererTOCLevel);
-        tocRenderer->header = hoedown_patch_render_toc_header;
-        document = hoedown_document_new(
-            tocRenderer, extensions, kMPRendererNestingLevel);
-        ob = hoedown_buffer_new(64);
-        hoedown_document_render(document, ob, input.bytes, input.length);
-        NSString *toc = MPStringFromHoedownBuffer(ob);
-        hoedown_document_free(document);
-        hoedown_buffer_free(ob);
-        hoedown_html_renderer_free(tocRenderer);
-
-        NSRegularExpression *tocRegex = [NSRegularExpression
-            regularExpressionWithPattern:@"<p.*?>\\s*\\[TOC\\]\\s*</p>"
-                                 options:NSRegularExpressionCaseInsensitive
-                                   error:NULL];
-        result = [tocRegex
-            stringByReplacingMatchesInString:result options:0
-                                       range:NSMakeRange(0, result.length)
-                                withTemplate:[NSRegularExpression
-                                    escapedTemplateForString:toc]];
-    }
-    return result;
+    char *html = MPMarkdownRenderHTML(input.bytes, input.length, &options);
+    NSString *result = html ? [NSString stringWithUTF8String:html] : nil;
+    free(html);
+    return result ?: @"";
 }
 
 static NSString *MPEscapeHTML(NSString *s)
