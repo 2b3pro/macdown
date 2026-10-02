@@ -7,7 +7,9 @@ function get_build_version() {
 }
 
 # Use the latest tag for short version (expected tag format "vn[.n[.n]]")
-# or if there are no tags, we make up version 0.0.<commit count>
+# or if there are no tags, we make up version 0.0.<commit count>. Between
+# releases this is the upcoming version in version.txt; the bundle version
+# (build number) tells builds of the same version apart.
 function get_short_version() {
     LATEST_TAG=$(git describe --tags --match 'v*' --abbrev=0 2>/dev/null) || LATEST_TAG="HEAD"
     if [ $LATEST_TAG = "HEAD" ]; then
@@ -24,7 +26,7 @@ function get_short_version() {
     else
         local tools_dir=$(dirname "${BASH_SOURCE[0]:-${(%):-%x}}")
         local next_version=$(cat "$tools_dir/version.txt")
-        SHORT_VERSION="${next_version}d${COMMIT_COUNT_SINCE_TAG}"
+        SHORT_VERSION="${next_version}"
     fi
     echo $SHORT_VERSION
 }

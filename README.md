@@ -228,7 +228,7 @@ pod install
 
 ### Versioning
 
-The short version comes from the newest `v*` tag when building exactly at that tag. Otherwise it is the value in `Tools/version.txt` with a `d<commits since tag>` suffix (for example `0.12.0d3`). Both the app and the Quick Look extension are stamped with the same version at build time. Bump `Tools/version.txt` when starting work on a new release, and tag the release commit `vX.Y.Z`.
+Builds are referred to as **vX.Y.Z (build N)**, which is also how the About window shows them. The version comes from the newest `v*` tag when building exactly at that tag, and otherwise from `Tools/version.txt`. The build number is the count of commits on `master`, with `.<commits on the branch>` added for branch builds (for example `1121.2`). Both the app and the Quick Look extension are stamped at build time. Bump `Tools/version.txt` when starting work on a new release, and tag the release commit `vX.Y.Z`.
 
 ### Translation
 
