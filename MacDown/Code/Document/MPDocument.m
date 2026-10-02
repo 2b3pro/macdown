@@ -210,6 +210,8 @@ typedef NS_ENUM(NSUInteger, MPWordCountType) {
 @property (nonatomic) BOOL alreadyRenderingInWeb;
 @property (strong) NSURL *pendingPDFExportURL;
 @property (strong) NSURL *pendingPrintTempURL;
+@property (copy) void (^previewRenderCompletionHandler)(void);
+@property (copy) NSString *previewMarkdown;
 @property (nonatomic) BOOL renderToWebPending;
 @property (nonatomic) NSInteger previewPendingRenderTasks;
 @property (strong) NSArray<NSNumber *> *webViewHeaderLocations;
@@ -223,6 +225,11 @@ typedef NS_ENUM(NSUInteger, MPWordCountType) {
 - (void)syncScrollers;
 -(void) updateHeaderLocations;
 
+@end
+
+// Private WebKit API; checked with -respondsToSelector: before use.
+@interface WebPreferences (MPLargeImageAsyncDecoding)
+- (void)setLargeImageAsyncDecodingEnabled:(BOOL)flag;
 @end
 
 static void (^MPGetPreviewLoadingCompletionHandler(MPDocument *doc))()
@@ -1014,6 +1021,23 @@ static void (^MPGetPreviewLoadingCompletionHandler(MPDocument *doc))()
     id callback = MPGetPreviewLoadingCompletionHandler(self);
     NSOperationQueue *queue = [NSOperationQueue mainQueue];
     [queue addOperationWithBlock:callback];
+
+    // Wait for a render of the document's own text. Renders of the empty
+    // editor can finish first while the window is still loading.
+    void (^handler)(void) = self.previewRenderCompletionHandler;
+    if (handler && self.previewShowsCurrentText)
+    {
+        self.previewRenderCompletionHandler = nil;
+        [queue addOperationWithBlock:handler];
+    }
+}
+
+// Whether the preview is a render of the editor's current text, with no
+// newer render waiting behind it.
+- (BOOL)previewShowsCurrentText
+{
+    return !self.loadedString && !self.renderToWebPending
+        && [self.previewMarkdown isEqualToString:self.editor.string];
 }
 
 - (void)webView:(WebView *)sender didFinishLoadForFrame:(WebFrame *)frame
@@ -1144,7 +1168,7 @@ static void (^MPGetPreviewLoadingCompletionHandler(MPDocument *doc))()
 
 - (NSString *)rendererStyleName:(MPRenderer *)renderer
 {
-    return self.preferences.htmlStyleName;
+    return self.styleOverride ?: self.preferences.htmlStyleName;
 }
 
 - (BOOL)rendererDetectsFrontMatter:(MPRenderer *)renderer
@@ -1194,6 +1218,7 @@ static void (^MPGetPreviewLoadingCompletionHandler(MPDocument *doc))()
         return;
     
     self.alreadyRenderingInWeb = YES;
+    self.previewMarkdown = renderer.currentMarkdown;
 
     // Delayed copying for -copyHtml.
     if (self.copying)
@@ -1448,6 +1473,20 @@ static void (^MPGetPreviewLoadingCompletionHandler(MPDocument *doc))()
     if (!ok || !outputURL)
         return;
 
+    NSError *error = nil;
+    if (![self postProcessExportedPDFAtURL:outputURL error:&error])
+    {
+        if (error)
+        {
+            NSAlert *alert = [NSAlert alertWithError:error];
+            [alert runModal];
+        }
+    }
+}
+
+- (BOOL)postProcessExportedPDFAtURL:(NSURL *)url
+                              error:(NSError *__autoreleasing *)error
+{
     // Check whether any post-processing is needed (margins or headers/footers).
     MPPreferences *prefs = self.preferences;
     BOOL needsMargins = (prefs.htmlPrintPaddingTop > 0 ||
@@ -1456,22 +1495,113 @@ static void (^MPGetPreviewLoadingCompletionHandler(MPDocument *doc))()
                          prefs.htmlPrintPaddingRight > 0);
     BOOL needsHeaderFooter = prefs.pdfHeaderFooterEnabled;
     if (!needsMargins && !needsHeaderFooter)
-        return;
+        return YES;
 
     MPPDFHeaderFooterProcessor *processor =
         [[MPPDFHeaderFooterProcessor alloc] init];
-    NSError *error = nil;
-    if (![processor processFileAtURL:outputURL
-                       documentTitle:self.presumedFileName
-                         preferences:self.preferences
-                               error:&error])
+    return [processor processFileAtURL:url
+                         documentTitle:self.presumedFileName
+                           preferences:self.preferences
+                                 error:error];
+}
+
+- (void)exportPDFHeadlesslyToURL:(NSURL *)url
+               completionHandler:(void (^)(NSError *error))handler
+{
+    __block BOOL finished = NO;
+    __weak MPDocument *weakSelf = self;
+    void (^finish)(NSError *) = ^(NSError *error) {
+        if (finished)
+            return;
+        finished = YES;
+        weakSelf.previewRenderCompletionHandler = nil;
+        handler(error);
+    };
+
+    self.previewRenderCompletionHandler = ^{
+        NSError *error = nil;
+        [weakSelf writePDFToURL:url error:&error];
+        finish(error);
+    };
+
+    // A renderer that never reports back (a script error, say) must not leave
+    // the caller waiting forever.
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 60 * NSEC_PER_SEC),
+                   dispatch_get_main_queue(), ^{
+        NSString *message = @"Timed out waiting for the preview to render.";
+        finish([NSError errorWithDomain:NSCocoaErrorDomain
+                                   code:NSUserCancelledError
+                               userInfo:@{
+                                   NSLocalizedDescriptionKey: message}]);
+    });
+
+    // Loading the window runs -windowControllerDidLoadNib:, which queues the
+    // first render of the preview. The window is never shown.
+    [self makeWindowControllers];
+    [self.windowControllers.firstObject window];
+
+    // WebKit decodes large images in the background when they are first
+    // drawn on screen, so a preview that is never shown prints them blank.
+    // Each preview has its own WebPreferences (see MPDocument.xib), so this
+    // does not affect other windows.
+    WebPreferences *webPreferences = self.preview.preferences;
+    SEL decoding = @selector(setLargeImageAsyncDecodingEnabled:);
+    if ([webPreferences respondsToSelector:decoding])
+        [webPreferences setLargeImageAsyncDecodingEnabled:NO];
+}
+
+- (BOOL)writePDFToURL:(NSURL *)url error:(NSError *__autoreleasing *)error
+{
+    // Only ever run a save-to-file job, and only into a folder that exists,
+    // so a bad destination can never fall through to a printer.
+    NSURL *folder = url.URLByDeletingLastPathComponent;
+    if (!url.isFileURL || ![folder checkResourceIsReachableAndReturnError:NULL])
     {
         if (error)
         {
-            NSAlert *alert = [NSAlert alertWithError:error];
-            [alert runModal];
+            NSString *message = [NSString stringWithFormat:
+                @"The folder %@ does not exist.", folder.path];
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain
+                                         code:NSFileNoSuchFileError
+                                     userInfo:@{
+                                         NSLocalizedDescriptionKey: message}];
         }
+        return NO;
     }
+
+    NSDictionary *settings = @{
+        NSPrintJobDisposition: NSPrintSaveJob,
+        NSPrintJobSavingURL: url,
+    };
+    NSPrintOperation *op = [self printOperationWithSettings:settings
+                                                      error:error];
+    if (!op)
+        return NO;
+    op.showsPrintPanel = NO;
+    op.showsProgressPanel = NO;
+
+    self.printing = YES;
+    BOOL ok = [op runOperation];
+    self.printing = NO;
+    // The print system can report success without writing anything, such as
+    // when the destination folder does not exist.
+    if (ok)
+        ok = [url checkResourceIsReachableAndReturnError:NULL];
+    if (!ok)
+    {
+        if (error)
+        {
+            NSString *message = [NSString stringWithFormat:
+                @"Could not write the PDF to %@.", url.path];
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain
+                                         code:NSFileWriteUnknownError
+                                     userInfo:@{
+                                         NSLocalizedDescriptionKey: message,
+                                         NSURLErrorKey: url}];
+        }
+        return NO;
+    }
+    return [self postProcessExportedPDFAtURL:url error:error];
 }
 
 - (IBAction)convertToH1:(id)sender

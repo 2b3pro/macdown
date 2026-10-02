@@ -19,4 +19,14 @@
 @property (nonatomic, readwrite) NSString *markdown;
 @property (nonatomic, readonly) NSString *html;
 
+// A style name, or an absolute path to a stylesheet, to render with instead
+// of the one chosen in preferences.
+@property (copy) NSString *styleOverride;
+
+// Renders the document in a window that is never shown and writes it as PDF
+// the way File > Export > PDF does, once the preview (MathJax and Mermaid
+// included) has finished rendering. The handler gets nil on success.
+- (void)exportPDFHeadlesslyToURL:(NSURL *)url
+               completionHandler:(void (^)(NSError *error))handler;
+
 @end

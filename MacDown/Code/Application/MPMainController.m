@@ -118,6 +118,12 @@ NS_INLINE void treat()
         [invocation invoke];
 #pragma clang diagnostic pop
     }
+}
+
+- (void)applicationWillFinishLaunching:(NSNotification *)notification
+{
+    // Register before launch finishes, so that a URL that launched the app
+    // (such as an export request from the command line tool) is handled.
     [[NSAppleEventManager sharedAppleEventManager]
         setEventHandler:self
             andSelector:@selector(openUrlSchemeAppleEvent:withReplyEvent:)
@@ -143,11 +149,15 @@ NS_INLINE void treat()
         return;
     }
     NSString *host = urlComponents.host;
-    if (!host || ![host isEqualToString:@"open"]) {
-        return;
-    }
     NSArray *queryItems = urlComponents.queryItems;
     if (!queryItems) {
+        return;
+    }
+    if ([host isEqualToString:kMPExportURLHost]) {
+        [self exportWithQueryItems:queryItems];
+        return;
+    }
+    if (!host || ![host isEqualToString:@"open"]) {
         return;
     }
     NSString *fileParam = [self valueForKey:@"url" fromQueryItems:queryItems];
@@ -176,6 +186,72 @@ NS_INLINE void treat()
              [wc.window setFrame:frame display:YES];
      }];
 
+}
+
+// Export a file as PDF for the command line tool, without showing it:
+// "x-macdown://export?url=file:///in.md&output=file:///out.pdf&token=abc",
+// optionally with "&css=/path/to/style.css".
+- (void)exportWithQueryItems:(NSArray *)queryItems
+{
+    NSString *token = [self valueForKey:@"token" fromQueryItems:queryItems];
+    if (!token)
+        return;
+    void (^reply)(NSError *) = ^(NSError *error) {
+        NSMutableDictionary *info = [NSMutableDictionary dictionary];
+        info[kMPExportSucceededKey] = @(error == nil);
+        if (error)
+            info[kMPExportErrorKey] = error.localizedDescription;
+        [[NSDistributedNotificationCenter defaultCenter]
+            postNotificationName:kMPExportDidFinishNotification object:token
+                        userInfo:info deliverImmediately:YES];
+    };
+
+    NSString *input = [self valueForKey:@"url" fromQueryItems:queryItems];
+    NSString *output = [self valueForKey:kMPOutputKey
+                          fromQueryItems:queryItems];
+    NSURL *inputURL = input ? [NSURL URLWithString:input] : nil;
+    NSURL *outputURL = output ? [NSURL URLWithString:output] : nil;
+    if (!inputURL.isFileURL || !outputURL.isFileURL)
+    {
+        NSString *message = @"The export request is missing a file URL.";
+        reply([NSError errorWithDomain:NSCocoaErrorDomain
+                                  code:NSFileReadInvalidFileNameError
+                              userInfo:@{NSLocalizedDescriptionKey: message}]);
+        return;
+    }
+
+    // Make a separate document rather than opening one, so that a copy of the
+    // file already open in a window (with its unsaved edits) is left alone and
+    // the export does not show up in Open Recent.
+    NSDocumentController *c = [NSDocumentController sharedDocumentController];
+    NSError *error = nil;
+    NSString *type = [c typeForContentsOfURL:inputURL error:&error];
+    NSDocument *document = nil;
+    if (type)
+    {
+        document = [c makeDocumentWithContentsOfURL:inputURL ofType:type
+                                              error:&error];
+    }
+    if (![document isKindOfClass:[MPDocument class]])
+    {
+        if (!error)
+        {
+            NSString *message = @"The file is not a Markdown document.";
+            error = [NSError errorWithDomain:NSCocoaErrorDomain
+                                        code:NSFileReadCorruptFileError
+                                    userInfo:@{
+                                        NSLocalizedDescriptionKey: message}];
+        }
+        reply(error);
+        return;
+    }
+    ((MPDocument *)document).styleOverride =
+        [self valueForKey:kMPCSSKey fromQueryItems:queryItems];
+    [(MPDocument *)document exportPDFHeadlesslyToURL:outputURL
+                                   completionHandler:^(NSError *error) {
+        [document close];
+        reply(error);
+    }];
 }
 
 - (NSString *)valueForKey:(NSString *)key fromQueryItems:(NSArray *)queryItems

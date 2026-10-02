@@ -39,9 +39,25 @@
     options.applicationName = ^{ return kMPApplicationName; };
     options.printHelpHeader = ^{
         NSString *fmt =
-            @"usage: %@ [file ...]\n\nOptions:";
-        return [NSString stringWithFormat:fmt, kMPCommandName];
+            @"usage: %@ [file ...]\n"
+            @"       %@ --pdf [-o output.pdf] [--css style] file ...\n\n"
+            @"Options:";
+        return [NSString stringWithFormat:fmt, kMPCommandName, kMPCommandName];
     };
+    [options registerOption:0 long:kMPPDFKey
+                description:@"Export each file as PDF next to it, without "
+                            @"opening a window."
+                      flags:GBOptionNoValue];
+    [options registerOption:'o' long:kMPOutputKey
+                description:@"With --pdf and a single file, write the PDF "
+                            @"here instead."
+                      flags:GBOptionRequiredValue];
+    [options registerOption:0 long:kMPCSSKey
+                description:@"With --pdf, the preview style to use instead of "
+                            @"the one set in MacDown: a style name like "
+                            @"GitHub2 (.css optional) or a path to a "
+                            @"stylesheet."
+                      flags:GBOptionRequiredValue];
     [options registerOption:'v' long:kMPVersionKey
                 description:@"Print the version and exit."
                       flags:GBOptionNoValue];
@@ -72,6 +88,21 @@
 - (BOOL)printsVersion
 {
     return [self.settings boolForKey:kMPVersionKey];
+}
+
+- (BOOL)exportsPDF
+{
+    return [self.settings boolForKey:kMPPDFKey];
+}
+
+- (NSString *)outputPath
+{
+    return [self.settings objectForKey:kMPOutputKey];
+}
+
+- (NSString *)stylesheet
+{
+    return [self.settings objectForKey:kMPCSSKey];
 }
 
 - (NSArray *)arguments

@@ -179,6 +179,7 @@ NS_INLINE BOOL MPAreNilableStringsEqual(NSString *s1, NSString *s2)
 @property (readonly) NSArray *stylesheets;
 @property (readonly) NSArray *scripts;
 @property (copy) NSString *currentHtml;
+@property (copy) NSString *currentMarkdown;
 @property (strong) NSOperationQueue *parseQueue;
 @property int extensions;
 @property BOOL smartypants;
@@ -499,6 +500,7 @@ static char *MPRendererLanguageCallback(const char *language, void *context)
 
 - (void)parseMarkdown:(NSString *)markdown {
     [self.currentLanguages removeAllObjects];
+    self.currentMarkdown = markdown;
     
     id<MPRendererDelegate> delegate = self.delegate;
     int extensions = [delegate rendererExtensions:self];
