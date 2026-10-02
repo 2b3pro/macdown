@@ -9,7 +9,8 @@
 	<!-- Read the user's MacDown rendering preferences (extension flags, style name). -->
 	<key>com.apple.security.temporary-exception.shared-preference.read-only</key>
 	<array>
-		<string>com.uranusjr.macdown</string>
+		<string>com.2b3pro.macdown</string>
+		<string>com.2b3pro.macdown-debug</string>
 	</array>
 	<!-- Read user-installed styles from ~/Library/Application Support/MacDown/Styles. -->
 	<key>com.apple.security.temporary-exception.files.home-relative-path.read-only</key>

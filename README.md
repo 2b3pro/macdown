@@ -166,7 +166,9 @@ There is no Homebrew cask for this fork (the `macdown` cask installs upstream 0.
 
 The Quick Look extension is registered by macOS once the app is in your Applications folder. If Finder previews do not change right away, launch MacDown once.
 
-In-app update checks still point at the upstream Sparkle feed, which only carries older releases, so they will not offer anything for this fork.
+This fork has its own bundle identifier, `com.2b3pro.macdown`, so it keeps its own settings and can be told apart from upstream MacDown. On first launch it copies your settings from upstream MacDown (`com.uranusjr.macdown`); custom styles and themes in `~/Library/Application Support/MacDown` are shared as before.
+
+Update checks are turned off until this fork has its own update feed, so **Check for Updates** is hidden for now. Watch the [Releases](https://github.com/2b3pro/macdown/releases) page for new versions.
 
 ## Screenshot
 

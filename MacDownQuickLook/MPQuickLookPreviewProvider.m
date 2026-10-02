@@ -16,7 +16,11 @@
 
 
 // Preferences domain of the containing app. Mirrors MPPreferences keys.
-static NSString * const kMPAppDefaultsDomain = @"com.uranusjr.macdown";
+#ifdef DEBUG
+static NSString * const kMPAppDefaultsDomain = @"com.2b3pro.macdown-debug";
+#else
+static NSString * const kMPAppDefaultsDomain = @"com.2b3pro.macdown";
+#endif
 static NSString * const kMPDefaultStyleName = @"GitHub2";
 static NSString * const kMPStylesDirectoryName = @"Styles";
 static NSString * const kMPStyleFileExtension = @"css";

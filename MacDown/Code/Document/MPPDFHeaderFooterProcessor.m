@@ -9,7 +9,7 @@
 #import <Cocoa/Cocoa.h>
 #import "MPPreferences.h"
 
-static NSString * const kMPPDFErrorDomain = @"com.uranusjr.macdown.pdf";
+static NSString * const kMPPDFErrorDomain = @"com.2b3pro.macdown.pdf";
 
 // Layout constants (in points).
 static const CGFloat kMPPDFMarginInset = 36.0;        // 0.5 inch from page edge
