@@ -111,6 +111,9 @@ NSString *MPStylePathForName(NSString *name)
 {
     if (!name)
         return nil;
+    // A full path to a stylesheet, as given to the command line tool.
+    if (name.isAbsolutePath)
+        return name;
     if (![name hasExtension:kMPStyleFileExtension])
         name = [name stringByAppendingPathExtension:kMPStyleFileExtension];
     NSString *path = MPPathToDataFile(name, kMPStylesDirectoryName);

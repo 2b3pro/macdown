@@ -32,6 +32,7 @@ typedef NS_ENUM(NSUInteger, MPCodeBlockAccessoryType)
 - (void)render;
 
 - (NSString *)currentHtml;
+- (NSString *)currentMarkdown;  // The Markdown currentHtml was parsed from.
 - (NSString *)HTMLForExportWithStyles:(BOOL)withStyles
                          highlighting:(BOOL)withHighlighting;
 

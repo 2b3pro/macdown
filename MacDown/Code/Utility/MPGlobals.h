@@ -27,3 +27,23 @@ static NSString * const kMPVersionKey = @"version";
 
 static NSString * const kMPFilesToOpenKey = @"filesToOpenOnNextLaunch";
 static NSString * const kMPPipedContentFileToOpen = @"pipedContentFileToOpenOnNextLaunch";
+
+// Headless export requested by the command line tool. The tool opens
+// "x-macdown://export?url=<file URL>&output=<file URL>&token=<token>" (plus
+// "&css=<absolute stylesheet path>" to override the preview style) in the
+// app, which answers with a distributed notification whose object is the
+// token and whose user info holds kMPExportSucceededKey (and, on failure,
+// kMPExportErrorKey with a description).
+static NSString * const kMPPDFKey = @"pdf";
+static NSString * const kMPOutputKey = @"output";
+static NSString * const kMPCSSKey = @"css";
+static NSString * const kMPExportURLHost = @"export";
+static NSString * const kMPExportSucceededKey = @"succeeded";
+static NSString * const kMPExportErrorKey = @"error";
+#ifdef DEBUG
+static NSString * const kMPExportDidFinishNotification =
+    @"com.2b3pro.macdown-debug.exportDidFinish";
+#else
+static NSString * const kMPExportDidFinishNotification =
+    @"com.2b3pro.macdown.exportDidFinish";
+#endif

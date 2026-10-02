@@ -14,6 +14,9 @@
 
 @property (nonatomic, assign, readonly) BOOL printsHelp;
 @property (nonatomic, assign, readonly) BOOL printsVersion;
+@property (nonatomic, assign, readonly) BOOL exportsPDF;
+@property (nonatomic, strong, readonly) NSString *outputPath;
+@property (nonatomic, strong, readonly) NSString *stylesheet;
 @property (nonatomic, strong, readonly) NSArray *arguments;
 
 - (void)printHelp:(BOOL)shouldExit;
