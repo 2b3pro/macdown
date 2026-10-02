@@ -4,8 +4,9 @@ Pod::Spec.new do |s|
   s.version  = '0.29.0.13'
   s.summary  = "GitHub's CommonMark + GFM parser, vendored with MacDown's patches."
   s.description = <<-DESC
-    cmark-gfm 0.29.0.gfm.13 with three small patches for MacDown (underscore
-    emphasis flag and backslash math). See MACDOWN.md for details.
+    cmark-gfm 0.29.0.gfm.13 with four small patches for MacDown (underscore
+    emphasis flag, backslash math, extension nodes in table cells). See
+    MACDOWN.md for details.
   DESC
   s.homepage = 'https://github.com/github/cmark-gfm'
   s.license  = { :type => 'BSD-2-Clause', :file => 'COPYING' }

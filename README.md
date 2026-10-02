@@ -9,42 +9,152 @@ MacDown is an open source Markdown editor for macOS, created by [Tzu-ping Chung]
 
 Upstream has been quiet since 2020, and its last release (0.7.3) ships an Intel-only Sparkle framework that needs Rosetta. This fork removes that dependency.
 
+> **This README is also a sample document.** It uses every kind of Markdown MacDown understands, so opening it in MacDown is a quick tour of the renderer. GitHub renders the standard parts; a few MacDown extensions (highlight, superscript, underline) only light up in MacDown. The **Markdown showcase** section below lists which preference turns on what.
+
 ## What is different in this fork
 
-**Platform and build**
+### Platform and build
 
 * Builds with current Xcode (27) against the macOS 13 SDK; deployment target is macOS 13 (Ventura) or later.
-* Universal binaries (arm64 + x86_64) for the app, the command line tool, the Quick Look extension, and Sparkle. Nothing in the bundle requires Rosetta.
+* Universal binaries (`arm64` + `x86_64`) for the app, the command line tool, the Quick Look extension, and Sparkle. Nothing in the bundle requires Rosetta.
 * Sparkle updated from 1.18 to 1.27 (last 1.x line, same API, universal). CocoaPods dependencies are lifted to the app's deployment target so the project builds again on modern Xcode.
 
-**Quick Look extension**
+### Markdown parser
 
-* Select a `.md` or `.markdown` file in Finder and press Space to see it rendered with your MacDown preview style.
+* Markdown is parsed by [cmark-gfm](https://github.com/github/cmark-gfm), GitHub's implementation of CommonMark and GitHub Flavored Markdown, replacing Hoedown. Documents render the way they do on GitHub, and the spec's edge cases (nested lists, emphasis next to punctuation, HTML blocks) behave predictably.
+* Highlight, superscript, underline and math are kept as MacDown extensions, each toggled in **Preferences > Markdown** or **Preferences > Rendering**.
+* Each extension is a small, self-contained cmark-gfm syntax extension. See [`MacDown/Code/Markdown/Extensions/README.md`](MacDown/Code/Markdown/Extensions/README.md) to write your own.
+* Differences from Hoedown:
+  1. Headings need a space after `#`.
+  2. A single `~` also strikes through, as on GitHub.
+  3. Footnotes use GitHub's markup.
+  4. The rarely used Quote extension (`"text"` to `<q>`) is gone.
+  5. SmartyPants handles quotes, dashes and ellipses, but no longer converts `(c)`, `(tm)` or fractions.
+
+### Quick Look extension
+
+* Select a `.md` or `.markdown` file in Finder and press <kbd>Space</kbd> to see it rendered with your MacDown preview style.
 * The extension honors your MacDown rendering preferences: Markdown extensions, SmartyPants, table of contents, task lists, hard wrap, and YAML front matter detection. It falls back to the GitHub2 style if your selected style file cannot be found.
 * Quick Look does not run JavaScript, so Prism syntax highlighting, MathJax, and Mermaid are not rendered in previews.
 
-**Printing and PDF export**
+### Printing and PDF export
 
 * Optional headers and footers on exported and printed PDFs. Each of the six zones (header/footer, left/center/right) can show the document name, a timestamp, page number, page count, "Page X of Y", or custom text. A different first page and the font size are configurable in a new **PDF** preferences pane.
 * Margins now follow **File > Page Setup** instead of hardcoded values, and the bundled stylesheets no longer add their own print margins, so whitespace is predictable.
 * User-configurable print content padding in the **Rendering** preferences.
 
-**Markdown parser**
-
-* Markdown is now parsed by [cmark-gfm](https://github.com/github/cmark-gfm), GitHub's implementation of CommonMark and GitHub Flavored Markdown, replacing Hoedown. Documents render the way they do on GitHub, and the spec's edge cases (nested lists, emphasis next to punctuation, HTML blocks) behave predictably.
-* Tables, footnotes, strikethrough, autolinks and task lists use the GFM syntax. Highlight (`==text==`), superscript (`^word`, `^(words)`), underline (`_text_`) and math (`$$…$$`, `\\(…\\)`, `\\[…\\]`, and optionally `$…$`) are kept as MacDown extensions, each toggled in **Preferences > Markdown**.
-* MacDown's extensions are small, self-contained cmark-gfm syntax extensions. See [`MacDown/Code/Markdown/Extensions/README.md`](MacDown/Code/Markdown/Extensions/README.md) to write your own.
-* Differences from Hoedown: headings need a space after `#`, a single `~` also strikes through (as on GitHub), footnotes use GitHub's markup, and the rarely used Quote extension (`"text"` to `<q>`) is gone. SmartyPants now handles quotes, dashes and ellipses but no longer converts `(c)`, `(tm)` or fractions.
-
-**Rendering**
+### Rendering and preferences
 
 * YAML front matter is stripped from the preview and from printed output instead of being rendered as a table.
 * New **GitHub-2020** preview style.
-* Mermaid updated from 8.4.3 to 12.1.0, adding mindmaps, timelines, XY charts, Sankey, block, architecture, and the other newer diagram types. Diagrams follow the preview style's light or dark background instead of always using the "forest" theme. Turn it on with **Rendering > Mermaid** (requires syntax highlighting).
+* Mermaid updated from 8.4.3 to 12.1.0, adding mindmaps, timelines, XY charts, Sankey, block, architecture, and the other newer diagram types. Diagrams follow the preview style's light or dark background instead of always using the "forest" theme.
+* Preference panels use Auto Layout and keep a consistent width when switching between them.
 
-**Preferences window**
+### Status
 
-* Panels use Auto Layout and keep a consistent width when switching between them.
+- [x] Native Apple Silicon build, no Rosetta
+- [x] Quick Look previews in Finder
+- [x] CommonMark + GFM parser
+- [x] Mermaid 12
+- [ ] Homebrew cask for this fork
+- [ ] An update feed for this fork's releases
+
+## Markdown showcase
+
+Everything in this section is live Markdown. Turn on the options in the last column to see all of it in MacDown.
+
+### Text
+
+| Feature | You type | You get | Turn on in MacDown |
+|:--------|:---------|:--------|:-------------------|
+| Bold | `**bold**` | **bold** | always on |
+| Italic | `*italic*` | *italic* | always on |
+| Bold italic | `***both***` | ***both*** | always on |
+| Inline code | `` `code` `` | `code` | always on |
+| Strikethrough | `~~struck~~` | ~~struck~~ | Markdown > Strikethrough |
+| Highlight | `==marked==` | ==marked== | Markdown > Highlight |
+| Superscript | `E = mc^2` | E = mc^2 | Markdown > Superscript |
+| Underline | `_underlined_` | _underlined_ | Markdown > Underline |
+| Autolink | `https://commonmark.org` | https://commonmark.org | Markdown > Autolink |
+| Keyboard keys | `<kbd>⌘</kbd> <kbd>S</kbd>` | <kbd>⌘</kbd> <kbd>S</kbd> | always on (raw HTML) |
+| Smart punctuation | `"quotes" -- and...` | "quotes" -- and... | Markdown > Smartypants |
+
+Without Underline, `_text_` is ordinary italics, which is also how GitHub shows it.
+
+### Lists
+
+1. Ordered lists number themselves
+2. They can nest:
+   * an unordered item
+   * another, with `code`
+     1. and a third level
+3. Task lists sit alongside them (**Rendering > Task list syntax**), like the **Status** checklist above.
+
+### Quotes
+
+> Markdown is intended to be as easy-to-read and easy-to-write as is feasible.
+>
+> > Quotes nest, and can hold **any** other Markdown.
+>
+> John Gruber, [Markdown: Syntax](https://daringfireball.net/projects/markdown/syntax)
+
+### Code
+
+Fenced code blocks are highlighted by Prism (**Rendering > Syntax highlighted code block**). This is how MacDown renders Markdown internally:
+
+```objc
+MPMarkdownOptions options = {0};
+options.extensions = MPMarkdownExtensionTables | MPMarkdownExtensionMath;
+options.renderFlags = MPMarkdownRenderTOC;
+
+char *html = MPMarkdownRenderHTML(text.UTF8String, strlen(text.UTF8String),
+                                  &options);
+```
+
+### Math
+
+With **Rendering > TeX-like math syntax** on, MacDown typesets math with MathJax (it needs an Internet connection). GitHub renders the same block:
+
+$$
+\int_{-\infty}^{\infty} e^{-x^2} \, dx = \sqrt{\pi}
+$$
+
+Inline math uses `\\(` and `\\)` in MacDown, or `$…$` with **Use dollar sign ($) as inline delimiter**. Math is passed through untouched, so underscores and asterisks inside a formula are never mistaken for Markdown.
+
+### Diagrams
+
+With **Rendering > Mermaid** on (it needs syntax highlighting), fenced `mermaid` blocks become diagrams. GitHub draws this one too. It shows how a document reaches the screen:
+
+```mermaid
+flowchart LR
+    md["Markdown"] --> cmark["cmark-gfm parser"]
+    cmark --> ext["MacDown extensions"]
+    ext --> html["HTML"]
+    html --> preview["Preview: Prism, MathJax, Mermaid"]
+    html --> ql["Quick Look"]
+    html --> pdf["PDF and print"]
+```
+
+### Footnotes
+
+Footnotes are on by default.[^parser] Write the note anywhere in the document; MacDown numbers them in reading order and collects them at the end.
+
+[^parser]: The footnote syntax is the one GitHub uses, so documents look the same in both places.
+
+### Table of contents
+
+With **Rendering > Detect table of contents token** on, a paragraph containing only `[TOC]` becomes a linked outline of the document's headings.
+
+### Collapsible sections
+
+<details>
+<summary>Raw HTML passes through, so this works in MacDown and on GitHub</summary>
+
+Anything inside a `<details>` element stays hidden until you open it. Leave a blank line after `<summary>` so the content is parsed as Markdown.
+
+</details>
+
+---
 
 ## Install
 
@@ -66,21 +176,13 @@ You may find full text of licenses about third-party components in the `LICENSE`
 
 The following editor themes and CSS files are extracted from [Mou](http://mouapp.com), courtesy of Chen Luo:
 
-* Mou Fresh Air
-* Mou Fresh Air+
-* Mou Night
-* Mou Night+
-* Mou Paper
-* Mou Paper+
-* Tomorrow
-* Tomorrow Blue
-* Tomorrow+
-* Writer
-* Writer+
-* Clearness
-* Clearness Dark
-* GitHub
-* GitHub2
+| Editor themes | Preview styles |
+|:--------------|:---------------|
+| Mou Fresh Air, Mou Fresh Air+ | Clearness, Clearness Dark |
+| Mou Night, Mou Night+ | GitHub, GitHub2 |
+| Mou Paper, Mou Paper+ | |
+| Tomorrow, Tomorrow Blue, Tomorrow+ | |
+| Writer, Writer+ | |
 
 ## Development
 
@@ -90,37 +192,43 @@ The following editor themes and CSS files are extracted from [Mou](http://mouapp
 * Git
 * [CocoaPods](https://cocoapods.org) 1.16 or later, either via [Bundler](http://bundler.io) or installed directly (`brew install cocoapods`)
 
-> Note: The Command Line Tools (CLT) should be unnecessary. If you failed to compile without it, please install CLT with
+> **Note:** The Command Line Tools (CLT) should be unnecessary. If you failed to compile without them, install them and report back:
 >
->     xcode-select --install
->
-> and report back.
+> ```sh
+> xcode-select --install
+> ```
 
-### Environment Setup
+### Environment setup
 
-After cloning the repository, run the following commands inside the repository root (directory containing this `README.md` file):
+After cloning the repository, run the following inside the repository root (the directory containing this `README.md`):
 
-    git submodule update --init
-    pod install
-    make -C Dependency/peg-markdown-highlight
+```sh
+git submodule update --init
+pod install
+make -C Dependency/peg-markdown-highlight
+```
 
-and open `MacDown.xcworkspace` in Xcode. The first command initialises the dependency submodule(s) used in MacDown; the second one installs dependencies managed by CocoaPods. If you use Bundler, run `bundle install` and then `bundle exec pod install` instead.
+Then open `MacDown.xcworkspace` in Xcode. The first command initializes the dependency submodules, the second installs dependencies managed by CocoaPods (including the vendored cmark-gfm in `Dependency/cmark-gfm`), and the third builds the editor's syntax highlighter. If you use Bundler, run `bundle install` and then `bundle exec pod install` instead.
 
-If you run into build issues later on, try running the following commands to update dependencies:
+If you run into build issues later on, update the dependencies:
 
-    git submodule update
-    pod install
+```sh
+git submodule update
+pod install
+```
 
 ### Targets
 
-* **MacDown**: the application.
-* **MacDownQuickLook**: the Quick Look preview extension, embedded in the app bundle. It links cmark-gfm and compiles MacDown's Markdown renderer (`MacDown/Code/Markdown`) directly, so it stays in sync with the app's rendering.
-* **macdown-cmd**: the `macdown` command line utility, copied into the app bundle.
-* **MacDownTests**: unit tests.
+| Target | What it is |
+|:-------|:-----------|
+| **MacDown** | The application. |
+| **MacDownQuickLook** | The Quick Look preview extension, embedded in the app bundle. It links cmark-gfm and compiles MacDown's Markdown renderer (`MacDown/Code/Markdown`) directly, so it stays in sync with the app's rendering. |
+| **macdown-cmd** | The `macdown` command line utility, copied into the app bundle. |
+| **MacDownTests** | Unit tests, including the Markdown rendering tests in `MPMarkdownTests.m`. |
 
 ### Versioning
 
-The short version comes from the newest `v*` tag when building exactly at that tag. Otherwise it is the value in `Tools/version.txt` with a `d<commits since tag>` suffix (for example `0.10.0d12`). Both the app and the Quick Look extension are stamped with the same version at build time. Bump `Tools/version.txt` when starting work on a new release, and tag the release commit `vX.Y.Z`.
+The short version comes from the newest `v*` tag when building exactly at that tag. Otherwise it is the value in `Tools/version.txt` with a `d<commits since tag>` suffix (for example `0.12.0d3`). Both the app and the Quick Look extension are stamped with the same version at build time. Bump `Tools/version.txt` when starting work on a new release, and tag the release commit `vX.Y.Z`.
 
 ### Translation
 

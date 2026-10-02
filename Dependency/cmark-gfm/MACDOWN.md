@@ -26,12 +26,16 @@ Each change is marked with a `MacDown:` comment.
    extensions before treating it as an escape. MacDown's math extension uses
    this for `\\(...\\)` and `\\[...\\]`. Extensions that don't handle a
    backslash return NULL, which falls through to the normal escape.
+4. **`extensions/table.c`, `can_contain`**: lets table cells hold any inline
+   node. Upstream lists the allowed types one by one, which rejects inline
+   nodes from other extensions, so `==highlight==` and `_underline_` did not
+   work inside tables.
 
 ## Updating
 
 1. Copy `src/` and `extensions/` from the new upstream tag, leaving out the
    files listed above.
-2. Re-apply the three patches (search the old copy for `MacDown:`).
+2. Re-apply the four patches (search the old copy for `MacDown:`).
 3. Update `generated/cmark-gfm_version.h`, the version in
    `cmark-gfm.podspec`, and this file.
 4. Run `pod install`, then the `MPMarkdownTests` unit tests.

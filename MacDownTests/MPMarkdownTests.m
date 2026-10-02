@@ -84,6 +84,15 @@ static char *MPTestLanguageCallback(const char *language, void *context)
     [self assertHTML:html contains:@"x^2"];
 }
 
+- (void)testExtensionsInsideTableCells
+{
+    NSString *html = [self render:
+        @"| a | b | c |\n|---|---|---|\n| ==mark== | _under_ | x^2 |"];
+    [self assertHTML:html contains:@"<td><mark>mark</mark></td>"];
+    [self assertHTML:html contains:@"<td><u>under</u></td>"];
+    [self assertHTML:html contains:@"<td>x<sup>2</sup></td>"];
+}
+
 - (void)testSuperscriptLeavesFootnotesAlone
 {
     NSString *html = [self render:@"Text[^1]\n\n[^1]: Note."];

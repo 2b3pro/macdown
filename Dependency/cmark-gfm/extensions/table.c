@@ -544,12 +544,9 @@ static int can_contain(cmark_syntax_extension *extension, cmark_node *node,
   } else if (node->type == CMARK_NODE_TABLE_ROW) {
     return child_type == CMARK_NODE_TABLE_CELL;
   } else if (node->type == CMARK_NODE_TABLE_CELL) {
-    return child_type == CMARK_NODE_TEXT || child_type == CMARK_NODE_CODE ||
-           child_type == CMARK_NODE_EMPH || child_type == CMARK_NODE_STRONG ||
-           child_type == CMARK_NODE_LINK || child_type == CMARK_NODE_IMAGE ||
-           child_type == CMARK_NODE_STRIKETHROUGH ||
-           child_type == CMARK_NODE_HTML_INLINE ||
-           child_type == CMARK_NODE_FOOTNOTE_REFERENCE;
+    // MacDown: accept any inline node, so inline nodes from other syntax
+    // extensions (highlight, underline, ...) work inside table cells.
+    return CMARK_NODE_TYPE_INLINE_P(child_type);
   }
   return false;
 }
